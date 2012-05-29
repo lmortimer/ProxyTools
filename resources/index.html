@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+
+	<!-- Basic Page Needs
+  ================================================== -->
+	<meta charset="utf-8">
+	<title>ProxyChecker</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<!-- Mobile Specific Metas
+  ================================================== -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- CSS
+  ================================================== -->
+	<link rel="stylesheet" href="/stylesheets/base.css">
+	<link rel="stylesheet" href="/stylesheets/skeleton.css">
+	<link rel="stylesheet" href="/stylesheets/layout.css">
+
+	<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+	<!-- Favicons
+	================================================== -->
+	<link rel="shortcut icon" href="/images/favicon.ico">
+	<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/images/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/images/apple-touch-icon-114x114.png">
+
+	<!-- JS
+	================================================== -->
+  	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  	<script type="text/javascript" src="/javascripts/json2.js"></script>
+
+
+	<script type="text/javascript">
+
+		$(document).ready(function(){
+
+			var socket = new WebSocket("ws://127.0.0.1:8080");
+
+			socket.onmessage = function(event){
+				console.log(event);
+
+				var packet = JSON.parse(event.data);
+
+				if(packet.type == "single_proxy"){
+					alert('Proxy ' + packet.ip + ' is ' + packet.alive);
+					alert(typeof(packet.alive));
+				}
+
+			};
+
+			$("#single_proxy_submit").click(function(){
+
+				var ip = $("#single_proxy_ip").val();
+
+				var send_raw = {'type' : 'single_proxy', 'ip' : ip};
+				var send = JSON.stringify(send_raw);
+
+				socket.send(send);
+
+			});
+
+
+			$("#button_checkproxies").click(function(){
+
+				var ips = $("#textarea_proxies").val().split("\n");
+
+				var send_raw = {'type' : 'check_proxies', 'ips' : ips};
+				var send = JSON.stringify(send_raw);
+
+				socket.send(send);
+
+			});
+		});
+
+	</script>
+
+</head>
+<body>
+
+
+
+	<!-- Primary Page Layout
+	================================================== -->
+
+	<!-- Delete everything in this .container and get started on your own site! -->
+
+	<div class="container">
+		<div class="sixteen columns">
+			<h1 class="remove-bottom" style="margin-top: 40px">Online Proxy Checker</h1>
+			<h5>Fast & Free SOCKS4, SOCKS5 and HTTP Proxy Checker</h5>
+			<hr />
+		</div>
+
+		<div class="sixteen columns">
+		  	<input type="text" id="single_proxy_ip" placeholder="IP:port">
+		  	<select id="single_proxy_type">
+		  		<option value="SOCKS5">SOCKS5</option>
+		  	</select>
+
+		  	<button id="single_proxy_submit">Check Proxy</button>
+
+		  	<hr>
+
+		  	<textarea id="textarea_proxies" width="90%" rows="10" placeholder="IP:Port (One per line)"></textarea>
+		  	<button id="button_checkproxies">Check Proxies</button>
+
+		</div>
+
+	</div><!-- container -->
+
+
+
+
+
+<!-- End Document
+================================================== -->
+</body>
+</html>
