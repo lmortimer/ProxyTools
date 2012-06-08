@@ -1,9 +1,32 @@
 (ns websocket.main
 	(:use 	[lamina.core]
+			[lamina.executor]
 			[aleph.http]
 			[proxy.check :only [socks5]])
 
 	(:require [clj-json [core :as json]]))
+
+
+(defn ws-socks5
+	[proxy channel]
+	(let
+		[result (socks5 proxy)
+		raw-response {	"type" "single_proxy"
+						"ip"   proxy
+						"alive" result}
+		encoded-response (json/generate-string raw-response)]
+
+		(println "HELLO FROM INSIDE")
+		;(println encoded-response)
+		(enqueue channel encoded-response)
+
+		))
+
+
+(defn fut-ws-socks5
+	[proxy channel]
+	(future (ws-socks5 proxy channel)))
+
 
 (defn ws-handler [channel request]
 	(receive-all channel 
@@ -22,9 +45,12 @@
 					(enqueue channel encoded-response)))
 
 			(if (= command "check_proxies")
-				(let [foo "bar"]
-				(println (get packet "ips"))
-				(println (type (get packet "ips")))))
+				(do
+					(println "checking multiple proxies")
+					(doall (for [i (get packet "ips")]
+						(future (ws-socks5 i channel))))
+					;(doall (map fut-ws-socks5 (get packet "ips") '(channel)))
+					))
 
 			(println packet)
 			;(enqueue channel msg)

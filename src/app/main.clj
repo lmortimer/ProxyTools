@@ -4,8 +4,14 @@
 
 (defn -main
   []
-  ;(start-websocket-server))
-  (println (socks5 "127.0.0.1:9050"))
-  (println (socks5 "127.0.0.1:9051"))
-  (println (socks5 "127.0.0.1:9052"))
-  (println (socks5 "127.0.0.1:9050")))
+    (start-websocket-server)
+
+	;(def proxies ["127.0.0.1:9050" "127.0.0.1:9050" "127.0.0.1:9051"])
+
+	#_(for [proxy proxies]
+		(future (socks5 proxy)))
+
+
+
+
+	)

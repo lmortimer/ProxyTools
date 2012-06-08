@@ -51,8 +51,13 @@
 				var packet = JSON.parse(event.data);
 
 				if(packet.type == "single_proxy"){
-					alert('Proxy ' + packet.ip + ' is ' + packet.alive);
-					alert(typeof(packet.alive));
+					
+					var colour = "red";
+					if(packet.alive)
+						colour = "green";
+
+					$("<tr><td style='background-color:" + colour + "'>" + packet.ip + "</td></tr>").hide().appendTo("#results").fadeIn();
+
 				}
 
 			};
@@ -100,7 +105,7 @@
 			<hr />
 		</div>
 
-		<div class="sixteen columns">
+		<div class="six columns">
 		  	<input type="text" id="single_proxy_ip" placeholder="IP:port">
 		  	<select id="single_proxy_type">
 		  		<option value="SOCKS5">SOCKS5</option>
@@ -113,6 +118,13 @@
 		  	<textarea id="textarea_proxies" width="90%" rows="10" placeholder="IP:Port (One per line)"></textarea>
 		  	<button id="button_checkproxies">Check Proxies</button>
 
+		</div>
+
+		<div class="nine columns offset-by-one">
+			<h2>Results</h2>
+			<table id="results">
+				
+			</table>
 		</div>
 
 	</div><!-- container -->
