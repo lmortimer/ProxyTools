@@ -22,6 +22,18 @@
 	<link rel="stylesheet" href="/stylesheets/skeleton.css">
 	<link rel="stylesheet" href="/stylesheets/layout.css">
 
+	<style>
+
+		#results {
+			overflow: scroll;
+			height:500px;
+		}
+
+		#results tr { display: block; padding: 6px 7px; font-weight: bold; font-size: 13px; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 12px; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px; text-shadow: 0 -1px rgba(0, 0, 0, 0.3); position: relative; color: white; }
+
+
+	</style>
+
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
@@ -52,26 +64,19 @@
 
 				if(packet.type == "single_proxy"){
 					
-					var colour = "red";
-					if(packet.alive)
-						colour = "green";
+					var colour = "#C00000";
+					var status = "dead";
 
-					$("<tr><td style='background-color:" + colour + "'>" + packet.ip + "</td></tr>").hide().appendTo("#results").fadeIn();
+					if(packet.alive){
+						colour = "#7FAE00";
+						status = "alive";
+					}
+
+					$("<tr class='" + status + "' style='background-color:" + colour + "'><td style='width:360px;'>" + packet.ip + "</td></tr>").hide().prependTo("#results").fadeIn(1000);
 
 				}
 
 			};
-
-			$("#single_proxy_submit").click(function(){
-
-				var ip = $("#single_proxy_ip").val();
-
-				var send_raw = {'type' : 'single_proxy', 'ip' : ip};
-				var send = JSON.stringify(send_raw);
-
-				socket.send(send);
-
-			});
 
 
 			$("#button_checkproxies").click(function(){
@@ -84,6 +89,13 @@
 				socket.send(send);
 
 			});
+
+
+			$("#filter_alive").click(function(){
+				$(".dead").fadeOut(1000);
+				return false;
+			});
+
 		});
 
 	</script>
@@ -106,22 +118,21 @@
 		</div>
 
 		<div class="six columns">
-		  	<input type="text" id="single_proxy_ip" placeholder="IP:port">
-		  	<select id="single_proxy_type">
-		  		<option value="SOCKS5">SOCKS5</option>
-		  	</select>
 
-		  	<button id="single_proxy_submit">Check Proxy</button>
+			<h2>Test Proxies</h2>
 
-		  	<hr>
+		  	<textarea id="textarea_proxies" style="width:340px" rows="20" placeholder="IP:Port (One per line)"></textarea>
+		
+			<input type="radio" name="proxy_type" value="SOCKS" checked>SOCKS
+			<input type="radio" name="proxy_type" value="HTTP">HTTP
 
-		  	<textarea id="textarea_proxies" width="90%" rows="10" placeholder="IP:Port (One per line)"></textarea>
+
 		  	<button id="button_checkproxies">Check Proxies</button>
 
 		</div>
 
 		<div class="nine columns offset-by-one">
-			<h2>Results</h2>
+			<h2 style="display:inline";>Results</h2><a href="" id="filter_alive">Filter Alive Proxies</a>
 			<table id="results">
 				
 			</table>
