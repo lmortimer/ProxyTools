@@ -24,13 +24,29 @@
 
 	<style>
 
-		#results {
-			overflow: scroll;
-			height:500px;
+		#results_wrapper {
+			overflow-y: auto;
+			height:420px;
+			width:350px;
 		}
 
-		#results tr { display: block; padding: 6px 7px; font-weight: bold; font-size: 13px; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 12px; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px; text-shadow: 0 -1px rgba(0, 0, 0, 0.3); position: relative; color: white; }
+		#results {
+			width:300px;
+		}
 
+		#results tr { display: block; padding: 6px 7px; font-weight: bold; font-size: 13px; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 12px; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px; text-shadow: 0 -1px rgba(0, 0, 0, 0.3); position: relative; color: white; width:100%;}
+
+		#textarea_proxies {
+			width: 350px;
+			height: 400px;
+		}
+
+		#filter_alive{
+			background-color:#7FAE00;
+			font-size:12px;
+			text-decoration:none;
+			font-weight:bold;
+		}
 
 	</style>
 
@@ -72,7 +88,7 @@
 						status = "alive";
 					}
 
-					$("<tr class='" + status + "' style='background-color:" + colour + "'><td style='width:360px;'>" + packet.ip + "</td></tr>").hide().prependTo("#results").fadeIn(1000);
+					$("<tr class='" + status + "' style='background-color:" + colour + "'><td>" + packet.ip + "</td></tr>").hide().prependTo("#results").fadeIn(1000);
 
 				}
 
@@ -121,7 +137,7 @@
 
 			<h2>Test Proxies</h2>
 
-		  	<textarea id="textarea_proxies" style="width:340px" rows="20" placeholder="IP:Port (One per line)"></textarea>
+		  	<textarea id="textarea_proxies" placeholder="IP:Port (One per line)"></textarea>
 		
 			<input type="radio" name="proxy_type" value="SOCKS" checked>SOCKS
 			<input type="radio" name="proxy_type" value="HTTP">HTTP
@@ -132,10 +148,16 @@
 		</div>
 
 		<div class="nine columns offset-by-one">
-			<h2 style="display:inline";>Results</h2><a href="" id="filter_alive">Filter Alive Proxies</a>
-			<table id="results">
+			<div style="margin-bottom:10px;">
+				<h2 style="display:inline;">Results</h2>
+				<a href="" id="filter_alive">Filter Alive Proxies</a>
+			</div>
+
+			<div id="results_wrapper">
+				<table id="results">
 				
-			</table>
+				</table>
+			</div>
 		</div>
 
 	</div><!-- container -->
