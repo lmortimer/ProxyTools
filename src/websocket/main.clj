@@ -7,10 +7,13 @@
 	(:require [clj-json [core :as json]]))
 
 
-(defn ws-socks5
-	[proxy channel]
+(defn ws-check-proxies
+	[proxy proxy-type channel]
 	(let
-		[result (socks proxy)
+		[result (cond
+					(= "SOCKS" proxy-type) (socks proxy)
+					(= "HTTP" proxy-type) (http proxy))
+
 		raw-response {	"type" "single_proxy"
 						"ip"   proxy
 						"alive" result}
@@ -28,24 +31,14 @@
 	(receive-all channel 
 		(fn [msg]
 			(let [	packet (json/parse-string msg)
-					command (get packet "type")]
-
-			(if (= command "single_proxy")
-				(let [raw-response {"type" "single_proxy"
-									"ip"	(get packet "ip")
-									"alive"	(socks (get packet "ip"))}
-
-					 encoded-response (json/generate-string raw-response)]
-
-					(println encoded-response)
-					(enqueue channel encoded-response)))
+					command (get packet "type")
+					proxy-type (get packet "proxy_type")]
 
 			(if (= command "check_proxies")
 				(do
 					(println "checking multiple proxies")
 					(doall (for [i (get packet "ips")]
-						(future (ws-socks5 i channel))))
-					;(doall (map fut-ws-socks5 (get packet "ips") '(channel)))
+						(future (ws-check-proxies i proxy-type channel))))
 					))
 
 			(println packet)

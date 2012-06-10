@@ -98,8 +98,9 @@
 			$("#button_checkproxies").click(function(){
 
 				var ips = $("#textarea_proxies").val().split("\n");
+				var proxy_type = $("input[name='proxy_type']:checked").val();
 
-				var send_raw = {'type' : 'check_proxies', 'ips' : ips};
+				var send_raw = {'type' : 'check_proxies', 'proxy_type' : proxy_type, 'ips' : ips};
 				var send = JSON.stringify(send_raw);
 
 				socket.send(send);
