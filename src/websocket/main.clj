@@ -2,7 +2,7 @@
 	(:use 	[lamina.core]
 			[lamina.executor]
 			[aleph.http]
-			[proxy.check :only [socks5]])
+			[proxy.check :only [socks http]])
 
 	(:require [clj-json [core :as json]]))
 
@@ -10,7 +10,7 @@
 (defn ws-socks5
 	[proxy channel]
 	(let
-		[result (socks5 proxy)
+		[result (socks proxy)
 		raw-response {	"type" "single_proxy"
 						"ip"   proxy
 						"alive" result}
@@ -23,10 +23,6 @@
 		))
 
 
-(defn fut-ws-socks5
-	[proxy channel]
-	(future (ws-socks5 proxy channel)))
-
 
 (defn ws-handler [channel request]
 	(receive-all channel 
@@ -37,7 +33,7 @@
 			(if (= command "single_proxy")
 				(let [raw-response {"type" "single_proxy"
 									"ip"	(get packet "ip")
-									"alive"	(socks5 (get packet "ip"))}
+									"alive"	(socks (get packet "ip"))}
 
 					 encoded-response (json/generate-string raw-response)]
 

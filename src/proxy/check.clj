@@ -11,16 +11,16 @@
 
 (def judge "http://www.trueboolean.com")
 
-
-(defn socks5
+(defn socks
   "Checks to see if a SOCKS5 proxy is alive"
   [ip]
   (let [[ip port] (split ip #":")
         address (new InetSocketAddress ip (Integer/parseInt port))
-        proxy (new Proxy (Proxy$Type/SOCKS) address)
+        prox (new Proxy (Proxy$Type/SOCKS) address)
         url (new URL judge)]
+
     (try
-      (let [urlconn (.openConnection url proxy)]
+      (let [urlconn (.openConnection url prox)]
 
       (.setConnectTimeout urlconn 10000)
       
@@ -29,9 +29,25 @@
 
     (catch RuntimeException e
       (if (instance? SocketException (.getCause e))
-        false))
+        false)))))
 
-    (finally "In Finally"))))
-    
-    ;(with-open [rdr (reader (.getInputStream urlconn))]
-      ;(printf "%s\n" (join "\n" (line-seq rdr))))
+
+(defn http
+  "Checks to see if a SOCKS5 proxy is alive"
+  [ip]
+  (let [[ip port] (split ip #":")
+        address (new InetSocketAddress ip (Integer/parseInt port))
+        prox (new Proxy (Proxy$Type/HTTP) address)
+        url (new URL judge)]
+
+    (try
+      (let [urlconn (.openConnection url prox)]
+
+      (.setConnectTimeout urlconn 10000)
+      
+      (if (= 200 (.getResponseCode urlconn))
+        true))
+
+    (catch RuntimeException e
+      (if (instance? SocketException (.getCause e))
+        false)))))
