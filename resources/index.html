@@ -49,6 +49,14 @@
 			text-decoration: none;
 		}
 
+		tr.alive {
+			background-color: #7FAE00;
+		}
+
+		tr.dead {
+			background-color: #C00000;
+		}
+
 	</style>
 
 	<!-- Favicons
@@ -77,15 +85,13 @@
 
 				if(packet.type == "single_proxy"){
 					
-					var colour = "#C00000";
 					var status = "dead";
 
 					if(packet.alive){
-						colour = "#7FAE00";
 						status = "alive";
 					}
 
-					$("<tr class='" + status + "' style='background-color:" + colour + "'><td>" + packet.ip + "</td></tr>").hide().prependTo("#results").fadeIn(1000);
+					$("<tr class='" + status + "'><td>" + packet.ip + "</td></tr>").hide().prependTo("#results").fadeIn(1000);
 
 				}
 
