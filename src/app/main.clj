@@ -5,5 +5,7 @@
 
 (defn -main
   []
-  	(run-jetty #'app {:port 80 :join? false})
-    (start-websocket-server))
+  	(run-jetty #'app {:port 1323 :join? false})
+    (start-websocket-server)
+    (println "Websocket listening on 127.0.0.1:8080")
+    (println "Webserver listening on 127.0.0.1:1323"))
