@@ -13,11 +13,6 @@
 
 (defroutes main-routes
 	(GET "/" [] index-template)
-	(GET "/er" [] "wtf")
-
-	(GET "/json/:id" [id] {	:status 200
-						:headers {"Content-Type" "application/json"}
-						:body (json/generate-string {"hi" "there" "ok" id})})
 
 	(route/resources "/")
 	(route/not-found "Page not found"))
