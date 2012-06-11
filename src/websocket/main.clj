@@ -19,11 +19,7 @@
 						"alive" result}
 		encoded-response (json/generate-string raw-response)]
 
-		(println "HELLO FROM INSIDE")
-		;(println encoded-response)
-		(enqueue channel encoded-response)
-
-		))
+		(enqueue channel encoded-response)))
 
 
 
@@ -36,17 +32,12 @@
 
 			(if (= command "check_proxies")
 				(do
-					(println "checking multiple proxies")
 					(doall (for [i (get packet "ips")]
 						(future (ws-check-proxies i proxy-type channel))))
-					))
-
-			(println packet)
-			;(enqueue channel msg)
-			))))
+					))))))
 
 
 (defn start-websocket-server
 	[]
-	(println "starting websocket server")
+	(println "Starting websocket server")
 	(start-http-server ws-handler {:port 8080 :websocket true}))

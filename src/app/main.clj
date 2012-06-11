@@ -6,8 +6,4 @@
 (defn -main
   []
   	(run-jetty #'app {:port 80 :join? false})
-    (start-websocket-server)
-    
-
-
-	)
+    (start-websocket-server))

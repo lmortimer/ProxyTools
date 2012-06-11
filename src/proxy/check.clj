@@ -33,7 +33,7 @@
 
 
 (defn http
-  "Checks to see if a SOCKS5 proxy is alive"
+  "Checks to see if an HTTP proxy is alive"
   [ip]
   (let [[ip port] (split ip #":")
         address (new InetSocketAddress ip (Integer/parseInt port))
