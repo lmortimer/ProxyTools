@@ -1,5 +1,5 @@
 (defproject clj-proxytools "1.0.0-SNAPSHOT"
-  :description "FIXME: write description"
+  :description "SOCKS and HTTP Proxy Checker"
   :dependencies [[org.clojure/clojure "1.3.0"]
   				 [ring "1.1.0"]
                  [compojure "1.0.4"]

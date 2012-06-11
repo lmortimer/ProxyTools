@@ -8,8 +8,9 @@ In the future it will be expanded into a full software suite for finding, testin
 
 ## Installation
 
-1. [Install Leiningen](https://github.com/technomancy/leiningen#installation)
+1. Install [Leiningen](https://github.com/technomancy/leiningen#installation)
 2. ```git clone https://github.com/lastkarrde/ProxyTools.git```
-3. ```lein deps```
-4. ```lein run```
-5. Open a modern web browser (that supports WebSockets) to 127.0.0.1:1323
+3. ```cd ProxyTools```
+4. ```lein deps```
+5. ```lein run```
+6. Open a modern web browser (that supports WebSockets) to 127.0.0.1:1323
