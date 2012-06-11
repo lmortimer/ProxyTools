@@ -9,7 +9,7 @@
             URLConnection
             SocketException]))
 
-(def judge "http://www.trueboolean.com")
+(def judge "http://www.microsoft.com")
 
 (defn socks
   "Checks to see if a SOCKS5 proxy is alive"
