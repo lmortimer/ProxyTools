@@ -9,4 +9,5 @@
                  [clj-geoip "0.1.1"]]
   :plugins      [[lein-ring "0.7.0"]]
   :main app.main
-  :ring {:handler website.main/app})
+  :ring {:handler website.main/app}
+  :java-source-paths ["java-src"])
