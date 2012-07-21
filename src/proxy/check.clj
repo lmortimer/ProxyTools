@@ -7,9 +7,12 @@
             Proxy$Type
             URL
             URLConnection
-            SocketException]))
+            SocketException]
+            [com.maxmind.geoip LookupService]))
 
 (def judge "http://www.microsoft.com")
+(def country-db (LookupService. "resources/GeoIP.dat"))
+
 
 (defn socks
   "Checks to see if a SOCKS5 proxy is alive"
@@ -51,3 +54,9 @@
     (catch RuntimeException e
       (if (instance? SocketException (.getCause e))
         false)))))
+
+
+(defn location
+  "Return the country code of the IP address."
+  [ip]
+  (.getCode (.getCountry country-db ip)))
