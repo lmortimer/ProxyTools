@@ -91,7 +91,7 @@
 						status = "alive";
 					}
 
-					$("<tr class='" + status + "'><td>" + packet.ip + "</td></tr>").hide().prependTo("#results").fadeIn(1000);
+					$("<tr class='" + status + "'><td>" + packet.ip + " | " + packet.location + "</td></tr>").hide().prependTo("#results").fadeIn(1000);
 
 				}
 

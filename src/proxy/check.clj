@@ -59,4 +59,5 @@
 (defn location
   "Return the country code of the IP address."
   [ip]
-  (.getCode (.getCountry country-db ip)))
+  (let [address (first (split ip #":"))]
+    (.getCode (.getCountry country-db address))))

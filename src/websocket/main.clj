@@ -2,7 +2,7 @@
 	(:use 	[lamina.core]
 			[lamina.executor]
 			[aleph.http]
-			[proxy.check :only [socks http]])
+			[proxy.check :only [socks http location]])
 
 	(:require [clj-json [core :as json]]))
 
@@ -16,7 +16,8 @@
 
 		raw-response {	"type" "single_proxy"
 						"ip"   proxy
-						"alive" result}
+						"alive" result
+						"location" (location proxy)}
 		encoded-response (json/generate-string raw-response)]
 
 		(enqueue channel encoded-response)))
