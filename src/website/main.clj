@@ -8,11 +8,11 @@
 			  	[clj-json.core :as json]))
 
 
-(deftemplate index-template "index.html"
+(deftemplate new-template "new.html"
 	[s])
 
 (defroutes main-routes
-	(GET "/" [] index-template)
+	(GET "/" [] new-template)
 
 	(route/resources "/")
 	(route/not-found "Page not found"))
