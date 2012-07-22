@@ -18,7 +18,7 @@
 						"ip"   proxy
 						"ptype" (:ptype result)
 						"alive" (:up result)
-						"location" (location proxy)
+						"location" (.toLowerCase (location proxy))
 						"anonymity" (:anonymity result)}
 		encoded-response (json/generate-string raw-response)]
 
