@@ -28,11 +28,15 @@
       (.setConnectTimeout urlconn 10000)
       
       (if (= 200 (.getResponseCode urlconn))
-        true))
+        {:up true
+          :ptype "socks"
+          :anonymity "Level 3"}))
 
     (catch RuntimeException e
       (if (instance? SocketException (.getCause e))
-        false)))))
+        { :up false
+          :ptype "socks"
+          :anonymity "-"})))))
 
 
 (defn http
@@ -49,11 +53,15 @@
       (.setConnectTimeout urlconn 10000)
       
       (if (= 200 (.getResponseCode urlconn))
-        true))
+        {:up true
+          :ptype "http"
+          :anonymity "HTTP untested"}))
 
     (catch RuntimeException e
       (if (instance? SocketException (.getCause e))
-        false)))))
+        {:up false
+         :ptype "http"
+         :anonymity "-"})))))
 
 
 (defn location

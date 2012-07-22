@@ -74,9 +74,10 @@
 					$("<tr class='" + status + "'><td>" + packet.ip + " | " + packet.location + "</td></tr>").hide().prependTo("#results").fadeIn(1000);
 					$('#datatable').dataTable().fnAddData([
 				        packet.ip,
+				        packet.alive,
+				        packet.ptype,
 				        packet.location,
-				        packet.location,
-				        packet.location]);
+				        packet.anonymity]);
 
 				}
 
@@ -120,30 +121,14 @@
 				<thead>
 					<tr>
 						<th>IP</th>
+						<th>Alive</td>
 						<th>Type</th>
 						<th>Country</th>
 						<th>Anonymity Level</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr class="alive">
-						<td>Some IP</td>
-						<td>SOCKS</td>
-						<td>NZ</td>
-						<td>Level </td>
-					</tr>
-					<tr class="alive">
-						<td>Some IP</td>
-						<td>SOCKS</td>
-						<td>NZ</td>
-						<td>Level </td>
-					</tr>
-					<tr class="alive">
-						<td>Some IP</td>
-						<td>SOCKS</td>
-						<td>NZ</td>
-						<td>Level </td>
-					</tr>
+
 				</tbody>
 
 			</table>

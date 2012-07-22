@@ -16,8 +16,10 @@
 
 		raw-response {	"type" "single_proxy"
 						"ip"   proxy
-						"alive" result
-						"location" (location proxy)}
+						"ptype" (:ptype result)
+						"alive" (:up result)
+						"location" (location proxy)
+						"anonymity" (:anonymity result)}
 		encoded-response (json/generate-string raw-response)]
 
 		(enqueue channel encoded-response)))
