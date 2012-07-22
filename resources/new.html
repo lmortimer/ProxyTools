@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<!-- Basic Page Needs
+  ================================================== -->
+	<meta charset="utf-8">
+	<title>ProxyChecker</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<!-- Mobile Specific Metas
+  ================================================== -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- CSS
+  ================================================== -->
+
+
+	<style>
+
+		
+
+		#textarea_proxies {
+			width: 350px;
+			height: 400px;
+		}
+
+
+		#footer a {
+			text-decoration: none;
+		}
+
+
+	</style>
+
+	<!-- Favicons
+	================================================== -->
+	<link rel="shortcut icon" href="/images/favicon.ico">
+	<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/images/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/images/apple-touch-icon-114x114.png">
+	<link rel="stylesheet" ttpe="text/css" href="http://yui.yahooapis.com/3.3.0/build/cssreset/reset-min.css">
+	<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.8.2/css/jquery.dataTables.css">
+	<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+	<!-- JS
+	================================================== -->
+  	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  	<script type="text/javascript" src="/javascripts/json2.js"></script>
+	<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.8.2/jquery.dataTables.min.js"></script>
+
+
+	<script type="text/javascript">
+
+		$(document).ready(function(){
+
+			$('#datatable').dataTable();
+
+			var socket = new WebSocket("ws://127.0.0.1:8080");
+
+			socket.onmessage = function(event){
+				console.log(event);
+
+				var packet = JSON.parse(event.data);
+
+				if(packet.type == "single_proxy"){
+					
+					var status = "dead";
+
+					if(packet.alive){
+						status = "alive";
+					}
+
+					$("<tr class='" + status + "'><td>" + packet.ip + " | " + packet.location + "</td></tr>").hide().prependTo("#results").fadeIn(1000);
+					$('#datatable').dataTable().fnAddData([
+				        packet.ip,
+				        packet.location,
+				        packet.location,
+				        packet.location]);
+
+				}
+
+			};
+
+
+			$("#button_checkproxies").click(function(){
+
+				var ips = $("#textarea_proxies").val().split("\n");
+				var proxy_type = $("input[name='proxy_type']:checked").val();
+
+				var send_raw = {'type' : 'check_proxies', 'proxy_type' : proxy_type, 'ips' : ips};
+				var send = JSON.stringify(send_raw);
+
+				socket.send(send);
+
+			});
+
+
+			$("#filter_alive").click(function(){
+				$(".dead").fadeOut(1000);
+				return false;
+			});
+
+		});
+
+	</script>
+
+</head>
+<body>
+
+	<div class="container">
+		<div class="sixteen columns">
+			<h1 class="remove-bottom" style="margin-top: 40px">Online Proxy Checker</h1>
+			<h5>Fast & Free SOCKS4, SOCKS5 and HTTP Proxy Checker</h5>
+			<hr />
+		</div>
+
+		<div class="sixteen columns">
+			<table cellpadding="0" cellspacing="0" border="0" class="display pretty" id="datatable" width="100%">
+				<thead>
+					<tr>
+						<th>IP</th>
+						<th>Type</th>
+						<th>Country</th>
+						<th>Anonymity Level</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="alive">
+						<td>Some IP</td>
+						<td>SOCKS</td>
+						<td>NZ</td>
+						<td>Level </td>
+					</tr>
+					<tr class="alive">
+						<td>Some IP</td>
+						<td>SOCKS</td>
+						<td>NZ</td>
+						<td>Level </td>
+					</tr>
+					<tr class="alive">
+						<td>Some IP</td>
+						<td>SOCKS</td>
+						<td>NZ</td>
+						<td>Level </td>
+					</tr>
+				</tbody>
+
+			</table>
+
+			<br><br>
+
+		  	<textarea id="textarea_proxies" placeholder="IP:Port (One per line)"></textarea>
+		
+			<input type="radio" name="proxy_type" value="SOCKS" checked>SOCKS
+			<input type="radio" name="proxy_type" value="HTTP">HTTP
+
+
+		  	<button id="button_checkproxies">Check Proxies</button>
+		</div>
+
+		<div class="sixteen columns" id="footer">
+			<a href="http://www.trueboolean.com">TrueBoolean.com</a> | <a href="http://github.com/lastkarrde/ProxyTools">github.com/lastkarrde/ProxyTools</a>
+		</div>
+
+
+	</div>
+
+</body>
+</html>
