@@ -46,6 +46,7 @@
 	<!-- JS
 	================================================== -->
   	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  	<script type="text/javascript" src="/javascripts/jquery.simplemodal.1.4.2.min.js"></script>
   	<script type="text/javascript" src="/javascripts/json2.js"></script>
 	<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.8.2/jquery.dataTables.min.js"></script>
 
@@ -97,9 +98,8 @@
 			});
 
 
-			$("#filter_alive").click(function(){
-				$(".dead").fadeOut(1000);
-				return false;
+			$("#add_proxies").click(function(){
+				$("#modal_check_proxies").modal({overlayClose:true});
 			});
 
 		});
@@ -114,6 +114,12 @@
 			<h1 class="remove-bottom" style="margin-top: 40px">Online Proxy Checker</h1>
 			<h5>Fast & Free SOCKS4, SOCKS5 and HTTP Proxy Checker</h5>
 			<hr />
+		</div>
+
+		<div class="add_proxies">
+			<h3>
+				<a href="#" id="add_proxies">Add Proxies</a>
+			</h3>
 		</div>
 
 		<div class="sixteen columns">
@@ -133,9 +139,13 @@
 
 			</table>
 
-			<br><br>
 
-		  	<textarea id="textarea_proxies" placeholder="IP:Port (One per line)"></textarea>
+		</div>
+
+		<div id="modal_check_proxies" style="display:none;    background-color: #333333;
+    border: 8px solid #444444;
+    padding: 12px;">
+			<textarea id="textarea_proxies" placeholder="IP:Port (One per line)"></textarea>
 		
 			<input type="radio" name="proxy_type" value="SOCKS" checked>SOCKS
 			<input type="radio" name="proxy_type" value="HTTP">HTTP

@@ -33,6 +33,10 @@ h1 {
 	margin: 1em 0;
 }
 
+.add_proxies {
+
+	text-align: center;
+}
 
 /*
  * DataTables framework
