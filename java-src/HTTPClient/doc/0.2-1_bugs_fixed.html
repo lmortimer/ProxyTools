@@ -1,0 +1,64 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>Bugs fixed in V0.2-1</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="index.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+
+<H1>Bugs fixed in V0.2-1</H1>
+
+<P>There were a few bugs in the initial release of Version 0.2 which were
+fixed in the current bug fix release. Here is the list of them:
+
+<UL>
+
+<LI>When using the methods <var>HTTPConnection.Head(file, form_data)</var>,
+<var>HTTPConnection.Head(file, form_data, hdrs)</var>,
+<var>HTTPConnection.Get(file, form_data)</var> and
+<var>HTTPConnection.Get(file, form_data, hdrs)</var> the form_data was
+URL-encoded twice instead of once.
+
+<LI>If the first request returned with a status code of 4xx or 5xx and
+the server is doing HTTP/1.0 then the request threw an EOFException.
+This happens for instance when the server requests authorization, or
+when the file doesn't exists, or if the server does not accept the
+request method.
+
+<LI>This one is not really a bug, but may be a nuisance: a thread is
+started in the HTTPClient to handle certain timeouts. In some cases this
+thread was suspended and never killed. The main effect was that some
+applications would seem to hang at the end, as the VM waits for all threads
+to die before exiting. Note though that if you start any windows stuff
+(this includes the authorization box popup in the HTTPClient) then there
+will always be a few threads hanging around when it's time to end. One
+way of forcing the program to exit is to call <var>System.exit()</var>
+when it's time to end.
+
+<LI>Under certain circumstances if an IOException occured during a request
+then this Exception was not properly thrown; this resulted in a
+NullPointerError in <var>StreamDemultiplexor.read()</var> shortly afterwards.
+
+</UL>
+
+<P>Thanx to the following people for finding and helping me fix these bugs:
+Gil Bregman, Martin Heinzl, Akkana Peck, Olivier Baujard.
+
+<P>
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+<HR>
+
+<ADDRESS>
+Ronald Tschal&auml;r / 16 August 1996 /
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

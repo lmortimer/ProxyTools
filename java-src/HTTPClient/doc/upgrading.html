@@ -1,0 +1,382 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>Changes from Version 0.2-3</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="index.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>Contents</H1>
+<UL>
+<LI><A HREF="#changes">Changes</A>
+<LI><A HREF="#upgrading">Upgrading</A>
+</UL>
+
+<H1><A NAME="changes">Changes from Version 0.2-3</A></H1>
+
+<P>Here is a (not necessarily complete) list of changes and new features
+since Version 0.2-3. For more information see the rest of the documentation.
+
+<ul>
+<P><LI>
+    Two classes have been renamed:
+    <UL>
+    <LI>AuthTypeNotImplementedException -&gt; AuthSchemeNotImplException
+    <LI>ProtocolNotSupportedException   -&gt; ProtocolNotSuppException
+    </UL>
+    This is because of MacOS which is limited to 32 character filenames.
+
+<P><LI>
+    The properties <var>socksHost</var>, <var>socksPort</var>, and
+    <var>socksVersion</var> have been renamed to
+    <var>HTTPClient.socksHost</var>, <var>HTTPClient.socksPort</var>, 
+    and <var>HTTPClient.socksVersion</var>, respectively.
+
+<P><LI>
+    The properties <var>http.proxyHost</var> and <var>http.proxyPort</var>
+    are recognized (these are new in JDK 1.1).
+
+<P><LI>
+    The concept of modules has been introduced. Processing, such redirection
+    handling, authorization handling, cookies, etc. is now done in the
+    appropriate module. Modules can be added and removed dynamically to
+    tailor the amount of processing desired. Modules also provide for an
+    easy way to extend the functionality of the client and a way to customize
+    it for special needs, without needing to change the core code. See
+    the <A HREF="advanced_info.html#modules">Advanced Info</A> for more info.
+
+<P><LI>
+    The functionality has been greatly enhanced with various modules:
+    In addition to authorization and redirection modules, there is a
+    cookie module, a content encoding module (to allow for and handle
+    compressed data in responses), a transfer encoding module (similar
+    to the content encoding module), and a content-md5 module (verifies
+    the optional MD5 hash of the body).
+
+<P><LI>
+    All request methods (such a Get(), Post(), etc.) and all methods in
+    HTTPResponse can now throw both an <var>IOException</var> and a (new)
+    <A HREF="api/HTTPClient/ModuleException.html">ModuleException</A>.
+
+<P><LI>
+    <var>AuthSchemeNotImplException</var> is now a subclass of
+    <var>ModuleException</var>.
+
+<P><LI>
+    The whole internal processing has been redesigned so that processing
+    of responses is delayed until necessary. In particular, the response
+    has not been processed when the request method (Get(), Post(), etc)
+    returns. This allows for the pipelining of requests within a single
+    thread. Response processing is triggered with the first call to any
+    method in the <A HREF="api/HTTPClient/HTTPResponse.html">HTTPResponse</A>.
+
+<P><LI>
+    An <A HREF="api/HTTPClient/HttpOutputStream.html">HttpOutputStream</A>
+    class has been added, together with the corresponding new request
+    methods in <A
+    HREF="api/HTTPClient/HTTPConnection.html">HTTPConnection</A>.  See the
+    api docs for restrictions and caveats associated with its usage.
+
+<P><LI>
+    Two new methods <A
+    HREF="api/HTTPClient/HTTPConnection.html#dontProxyFor">dontProxyFor()</A>
+    and <A
+    HREF="api/HTTPClient/HTTPConnection.html#doProxyFor">doProxyFor()</A>
+    for handling a list of hosts, for which no proxy is to be used, have
+    been added to <var>HTTPConnection</var>. Two properties for
+    initializing this list are now also understood:
+    <var>HTTPClient.nonProxyHosts</var> and <var>http.nonProxyHosts</var>
+
+<P><LI>
+    The <A
+    HREF="api/HTTPClient/HTTPConnection.html#Options">Options()</A>
+    request method has been further overloaded to allow for a body to be
+    included with request.
+
+<P><LI>
+    A <var>Context</var> concept has been introduced to allow the simulation
+    of multiple independent clients within one application. See the
+    <A HREF="advanced_info.html#contexts">Advanced Info</A> for more info.
+
+<P><LI>
+    <A HREF="api/HTTPClient/HTTPConnection.html#setRawMode">setRawMode()</A>
+    is deprecated. Because response processing is now deferred, this
+    method is not needed anymore. Also, the amount of processing can be
+    controlled through the adding and removing of modules.
+
+<P><LI>
+    A <A HREF="api/HTTPClient/HTTPConnection.html#stop()">stop()</A>
+    method has been added to <var>HTTPConnection</var>. This will abort
+    all request currently in progress and close the socket.
+
+<P><LI>
+    A <A HREF="api/HTTPClient/HTTPConnection.html#setTimeout">timeout</A>
+    has been added to <var>HTTPConnection</var>. This will cause socket
+    creating and the reading of response headers to time out if they
+    take too long. See the <A
+    HREF="advanced_info.html#timeouts">Advanced Info</A> for more info.
+
+<P><LI>
+    The class <A HREF="api/HTTPClient/Util.html">Util</A> is now
+    public and contains a number of (hopefully) useful methods for
+    creating and parsing http headers. Note especially <A
+    HREF="api/HTTPClient/Util.html#httpDate(java.util.Date)">httpDate()</A>
+    which should be used when sending any headers containing dates.
+
+<P><LI>
+    The method <A
+    HREF="api/HTTPClient/Util.html#getParameter">getParameter()</A> has
+    been moved from the <A HREF="api/HTTPClient/Codecs.html">Codecs</A>
+    class to the <A HREF="api/HTTPClient/Util.html">Util</A> class.
+
+<P><LI>
+    New methods in <A
+    HREF="api/HTTPClient/HTTPConnection.html">HTTPConnection</A> for
+    querying the state: <A
+    HREF="api/HTTPClient/HTTPConnection.html#getProtocol()">getProtocol()</A>,
+    <A
+    HREF="api/HTTPClient/HTTPConnection.html#getHost()">getHost()</A>,
+    <A
+    HREF="api/HTTPClient/HTTPConnection.html#getPort()">getPort()</A>,
+    <A
+    HREF="api/HTTPClient/HTTPConnection.html#getProxyHost()">getProxyHost()</A>
+    and <A
+    HREF="api/HTTPClient/HTTPConnection.html#getProxyPort()">getProxyPort()</A>.
+
+<P><LI>
+    When attempting to create a socket, if the host has multiple IP
+    addresses (i.e. the dns lookup returns multiple A records) then all
+    addresses are tried until one succeeds. Previously only the first
+    address was tried.
+
+<P><LI>
+    When talking to HTTP/1.0 proxies, the <var>Proxy-Connection</var> is
+    used to attempt persistent connections with the proxy.
+
+<P><LI>
+    A new method <A
+    HREF="api/HTTPClient/HTTPConnection.html#setAllowUserInteraction(boolean)">setAllowUserInteraction()</A>
+    has been added to <var>HTTPConnection</var>. <STRONG>Note:</STRONG> <A
+    HREF="api/HTTPClient/AuthorizationInfo.html#setAuthHandler">setAuthHandler(null)</A>
+    should not be used anymore to disable the authorization popup, as this
+    also disables the handling of the Digest authorization scheme.
+
+<P><LI>
+    Socket connections are now closed a little more aggressively. The exact
+    conditions under which they are closed is now documented (see the
+    <A HREF="advanced_info.html#close_con">Advanced Info</A>).
+
+<P><LI>
+    Redirection handling modified: 302 is now handled just like 303 (i.e.
+    the new request is always done using the GET request method), and the
+    new 307 response code is recognized.
+
+<P><LI>
+    The 305 response code is now only honored a proxy is not already being
+    used.
+
+<P><LI>
+    The redirection module now reuses the current
+    <var>HTTPConnection</var> instance if the new location refers to the
+    same server (it previously always created a new HTTPConnection
+    instance).
+
+<P><LI>
+    Permanent redirections (301) are cached; when a request for a permanently
+    redirected url is made then the request is automatically redirected to
+    the new url before being sent.
+
+<P><LI>
+    The URL returned by <A
+    HREF="api/HTTPClient/HTTPResponse.html#getEffectiveURL()">getEffectiveURL()</A>
+    now contains the query string sent, if any (previously the query string
+    in this URL was always empty).
+
+<P><LI>
+    The Digest authentication scheme is now handled by the default
+    authorization handler. Two new convenience methods have been added
+    for this: <A
+    HREF="api/HTTPClient/HTTPConnection.html#addDigestAuthorization(java.lang.String, java.lang.String, java.lang.String)">HTTPConnection.addDigestAuthorization()</A>
+    and <A
+    HREF="api/HTTPClient/AuthorizationInfo.html#addDigestAuthorization(java.lang.String, int, java.lang.String, java.lang.String, java.lang.String)">AuthorizationInfo.addDigestAuthorization()</A>
+
+<P><LI>
+    <var>HTTPConnection.addAuthorization()</var> has been removed.
+
+<P><LI>
+    Authorization info is preemptively sent when reasonable. Proxy
+    authorization info is also automatically sent with every request when
+    using a proxy that requires authentication (previously the info was
+    only sent in response to the corresponding status code).
+
+<P><LI>
+    The <A
+    HREF="api/HTTPClient/AuthorizationHandler.html">AuthorizationHandler</A>
+    interface has been almost completely changed. This was necessary,
+    because the original interface was only capable of handling the most
+    simple of authorization schemes. The new interface ought to be handle
+    any scheme that follows the basic structure of http authentication.
+    In particular, it is now possible to handle the Digest authentication
+    scheme with this interface.
+
+<P><LI>
+    <A HREF="api/HTTPClient/HTTPResponse.html">HTTPResponse</A> has new
+    methods for accessing trailers (the chunked encoding allows for
+    "headers" to be sent at the end of the body): <A
+    HREF="api/HTTPClient/HTTPResponse.html#getTrailer">getTrailer()</A>, <A
+    HREF="api/HTTPClient/HTTPResponse.html#getTrailerAsInt">getTrailerAsInt()</A>,
+    and <A
+    HREF="api/HTTPClient/HTTPResponse.html#getTrailerAsDate">getTrailerAsDate()</A>.
+
+<P><LI>
+    Requests are automatically retried if an IOException occurs on the
+    socket. This is subject to certain restrictions though, because of
+    the problem that the sequence of unanswered requests may not be
+    idempotent.
+
+<P><LI>
+    A new <A
+    HREF="api/HTTPClient/HttpURLConnection.html">HttpURLConnection</A>
+    class has been added (and the associated URLStreamHandler's). By
+    setting the property <tt>java.protocol.handler.pkgs=HTTPClient</tt>
+    you can use the HTTPClient as a replacement for the JDK's HttpClient,
+    i.e.  <code>URL.openConnection()</code> will return an instance of
+    <var>HTTPClient.HttpURLConnection</var>.
+
+<P><LI>
+    Debugging for the various parts of the client can be enabled and
+    disabled in the new <var>GlobalConstants</var> class.
+
+<P><LI>
+    Various bug fixes ...
+
+</ul>
+
+
+<H1><A NAME="upgrading">Upgrading from Version 0.2-3</A></H1>
+
+<P>There have been some changes which prevent V0.3 from being plug-in
+compatible with V0.2-X. However, these changes are mostly syntactical,
+and upgrading to V0.3 should be fairly straightforward and easy.
+
+<UL>
+<P><LI>Two classes have been renamed:
+    <UL>
+    <LI>AuthTypeNotImplementedException -&gt; AuthSchemeNotImplException
+    <LI>ProtocolNotSupportedException   -&gt; ProtocolNotSuppException
+    </UL>
+<P><LI>The properties <var>socksHost</var>, <var>socksPort</var>, and
+    <var>socksVersion</var> have been renamed to
+    <var>HTTPClient.socksHost</var>, <var>HTTPClient.socksPort</var>, 
+    and <var>HTTPClient.socksVersion</var>, respectively.
+<P><LI>All request methods in <var>HTTPConnection</var> (i.e Get(), Head(),
+    Post(), etc) now throw <var>IOException</var> and
+    <var>ModuleException</var>. If you were previously catching the
+    <var>IOException</var> and the <var>AuthTypeNotImplementedException</var>
+    separately, then just replace <var>AuthTypeNotImplementedException</var>
+    by <var>ModuleException</var>. Example:
+    <PRE>
+    catch (AuthTypeNotImplementedException atnie)
+    {
+	System.err.println("Can't handle the authorization scheme " +
+			   atnie.getMessage());
+    } </PRE>
+    becomes
+    <PRE>
+    catch (ModuleException me)
+    {
+	System.err.println("Error handling request: " + me.getMessage());
+    } </PRE>
+    If you were catching <var>Exception</var> then no changes are required.
+<P><LI>All methods in <var>HTTPResponse</var> now also throw
+    <var>ModuleException</var> (in addition to <var>IOException</var>).
+    Depending on how your code is written you'll need to added extra
+    <code>catch()</code>'s for the <var>ModuleException</var>.
+<P><LI>If you've written your own <var>AuthorizationHandler</var>, then this
+    handler will need to be updated. This involves adding stubs for the
+    new methods <A
+    HREF="api/HTTPClient/AuthorizationHandler.html#fixupAuthInfo">fixupAuthInfo</A>,
+    <A
+    HREF="api/HTTPClient/AuthorizationHandler.html#handleAuthHeaders">handleAuthHeaders</A>,
+    and <A
+    HREF="api/HTTPClient/AuthorizationHandler.html#handleAuthTrailers">handleAuthTrailers</A>
+    and adjusting the signature of <A
+    HREF="api/HTTPClient/AuthorizationHandler.html#getAuthorization">getAuthorization()</A>.
+    The stubs are as follows:
+    <PRE>
+    public AuthorizationInfo fixupAuthInfo(AuthorizationInfo info,
+					   RoRequest req,
+					   AuthorizationInfo challenge,
+					   RoResponse resp)
+    {
+	return info;
+    }
+
+    public void handleAuthHeaders(Response resp, RoRequest req,
+				  AuthorizationInfo prev,
+				  AuthorizationInfo prxy)
+    {
+    }
+
+    public void handleAuthTrailers(Response resp, RoRequest req,
+				   AuthorizationInfo prev,
+				   AuthorizationInfo prxy)
+    {
+    } </PRE>
+<P><LI>If you used <code>AuthorizationInfo.setAuthHandler(null)</code> to
+    prevent the authorization popup from appearing, then use
+    <code>HTTPConnection.setDefaultAllowUserInteraction(false)</code>
+    instead.
+<P><LI>Change any <code>Codecs.getParameter(...)</code> to
+    <code>Util.getParameter(...)</code>.
+</UL>
+
+
+<P>To ease the transition from Version 0.2-3 you can run the following
+sed script over your files. It won't do all the work, but it might help.
+If anybody wants to write a Windoze equivalent I'll put it up here. You
+can also <A HREF="upgrade">download</A> it directly.
+
+<pre>
+#!/bin/sh
+#
+# Tries to upgrade methods from V0.2-3 to V0.3
+#
+# Those methods that have changed their signature are marked with the
+# comment /* NEEDS WORK */
+#
+# Usage: upgrade &lt; OldCode.java &gt; NewCode.java
+#
+
+sed -e '
+    s/\&lt;AuthTypeNotImplementedException\&gt;/AuthSchemeNotImplException/g
+    s/\&lt;ProtocolNotSupportedException\&gt;/ProtocolNotSuppException/g
+    s/\&lt;Codecs.getParameter\&gt;/Util.getParameter/g
+    s/\&lt;socksHost\&gt;/HTTPClient.&/g
+    s/\&lt;socksPort\&gt;/HTTPClient.&/g
+    s/\&lt;socksVersion\&gt;/HTTPClient.&/g
+    s/\&lt;HTTPConnection\.addAuthorizationInfo\&gt;/AuthorizationInfo\.addAuthorizationInfo \/* NEEDS WORK *\/ /g
+    s/\&lt;AuthorizationInfo\.setAuthHandler(null)/HTTPConnection\.setDefaultAllowUserInteraction(false)/g
+'
+
+# the end
+</pre>
+
+
+<P>
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+<HR>
+
+<ADDRESS>
+Ronald Tschal&auml;r / 30. January 1998 /
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

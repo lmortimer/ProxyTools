@@ -1,0 +1,98 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>Diagnosing And Reporting Bugs</TITLE>
+<LINK REV="made" HREF="mailto:ronald@innovation.ch">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>Diagnosing a Problem</H1>
+
+<P>If you run into a problem, here are a couple things that might help in
+trying to narrow it down:
+<ul>
+    <LI>Turn on debugging output. This can be done on the command line
+	using something like
+<PRE>
+	java -DHTTPClient.log.mask=-1 ...
+</PRE>
+	which will turn on logging for everything; more selective logging
+	can be enabled if desired, and the logging output can be redirected -
+	see the <A HREF="api/HTTPClient/Log.html">Log</A> class for details.
+
+    <LI>If things seem to hang, get a thread dump. On unix's this can be
+	achieved by hitting &lt;Control&gt;-\ or by sending a SIGQUIT to the
+	JVM. On M$ this can be achieved by hitting
+	&lt;Control&gt;-&lt;Break&gt; .
+</ul>
+
+
+<H1>Reporting Bugs</H1>
+
+<P>If you run into a problem, bug, have questions, suggestions, or comments,
+please first check the <A HREF="FAQ.html">FAQ</A> and the rest of the docs.
+If that doesn't answer your question, then feel free to <A
+HREF="mailto:ronald@innovation.ch">send me an email</A>.
+
+<P>When submitting a bug report or other problem report, make sure
+you supply the following information (some of it can be skipped if
+you know it's not relevant):
+
+<ol>
+<LI>Which version of the HTTPClient you're using. This can be found
+    in any source file at the very top and in all the javadocs.
+    Additionally, the version is sent as part of the User-Agent header,
+    so a network trace will also reveal what version is running.
+
+<LI>If you get an exception, then please provide <em>the full stack
+    trace</em>, exactly as printed out. Note that its often important
+    to see the <em>exact</em> error message - something along the lines
+    of "I got an IOException" is almost useless. Also make sure that
+    the JIT is disabled if you're using one so that the stack trace
+    contains line numbers (if you're using jdk 1.3 with HotSpot then
+    you'll always get line numbers).
+
+<LI>The full jdk version ("jdk -fullversion") and platform. While java
+    does run well anywhere, there are broken JVM's out there, and some
+    of the exception messages can be platform dependent.
+
+<LI>If this error occurs trying to send a request to a particular site,
+    please provide at least the URL for that site. Also, if the problem
+    occurs doing anything more than a simple GET (e.g. doing a POST with
+    certain data), please try to provide a complete code sample. The
+    easier it is for me to reproduce, the quicker I can give you a fix
+    (or tell you where the problem is). For simple GETs the URL is
+    enough, though.
+    <P>If the URL is internal (i.e. not accessable from the internet),
+    then please turn on the debug logging and send me the output.
+
+<LI>If the application seems to hang, or seems to spend a lot of time
+    somewhere, then get a thread dump (see above).
+
+<LI>If you are having trouble getting your code to work, then show me
+    that code (or at least the relevant parts of it). Trying to guess
+    at what it looks like can be somewhat tricky...
+</ol>
+
+<P>In general, the more info you can provide up front the quicker I can
+deal with it. I tend to be pretty busy, and therefore tend to sort and
+answer mail according to how quickly I can provide an answer.
+
+<P><HR>
+
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+
+<HR>
+
+<ADDRESS>
+Ronald Tschal&auml;r / 6. May 2001 /
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

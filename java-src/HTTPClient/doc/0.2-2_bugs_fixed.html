@@ -1,0 +1,99 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>Bugs fixed in V0.2-2</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="index.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+
+<H1>Bugs fixed in V0.2-2</H1>
+
+<P>There have been a few more bugs since the release of the last bug fix
+   version V0.2-1 and which this release attempts to fix. Here is the list
+   of them:
+
+<UL>
+
+<LI>If redirecting a request containing a query string, then the old query
+    string was added to the new location even if the new location contained
+    a new query string.
+
+<LI>In a proxy redirect (status code 305) the wrong resource was used for
+    the new request.
+
+<LI>A few problems with the chunked encoding were solved. There was a bug
+    were multiple responses on the same connection that used this encoding
+    would be decoded wrong. Furthermore, the parser for the chunk length has
+    been loosend to accept non-conforming chunk headers.
+
+<LI>Most of the timeout thread problems have been worked around.
+    <code>suspend()</code> is not used anymore to avoid Netscape problems,
+    and the thread is set to daemon mode to avoid hanging at exit time.
+
+<LI>The JDK 1.0.2 (and possibly other VMs) has a bug where it doesn't
+    release resources referenced by a thread if the thread is
+    <code>stop()</code>'d instead of being allowed to fall off the end
+    of run(). This meant that the Timeout thread would keep a large part
+    of the resources from being gc'd, thereby creating the equivalent of
+    a memory leak. Therefore the thread is not <code>stop()</code>'d
+    anymore, but instead falls of the end of it's <code>run()</code>.
+
+<LI>The parser for responses has been loosend up. It now deals with erroneous
+    white space preceding the response, it correctly handles non existent
+    reason phrases, and it also handles responses from buggy NCSA servers.
+    It also now throws a <code>ProtocolException</code> if the response
+    version is not HTTP/0.9 or HTTP/1.* .
+
+<LI><code>HTTPResponse.getHeaderAsXXX()</code> would not work if they were
+    the first header requested (i.e. no other <code>getHeader()</code> had
+    been called previously). The side effect of this fix is that these two
+    methods may now (correctly) also throw an <code>IOException</code>.
+
+<LI>A couple deadlock problems in the response stream handling have been
+    fixed. One could only turn up if you had done a
+    <code>setRawMode(true)</code> for the connection, and the other turned
+    up under certain conditions when an IOException occured.
+
+<LI>Sending a request URI "*" would not work correctly when using a proxy.
+
+<LI>Some (buggy) servers return a 500 status on a HTTP/1.1 request. This
+    situation is now handled by retrying the request as HTTP/1.0 .
+
+<LI>Some (buggy) servers don't like a port specification in the Host: header
+    if the port is the default port (80). The port part is now only sent if
+    a non-default port is used.
+
+<LI>The <var>max</var> parameter in the <var>Keep-Alive</var> header is now
+    honored. This is necessary as Apache would ReSeT a connection (instead
+    of just closing it) if too many requests were sent, resulting in
+    unnecessary IOExceptions.
+
+<LI>The signature of the <code>Codecs.mpFormDataEncode()</code> method has
+    been changed slightly: the last parameter is now an array of NVPairs
+    instead of an NVPair. This was a bug in that NVPair ought to be
+    immutable, but this method violated that.
+
+</UL>
+
+<P>Thanx to Doron Shpasser and Kuo Chiang for finding and reporting a number
+of the bugs.
+
+
+<P>
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+<HR>
+
+<ADDRESS>
+Ronald Tschal&auml;r / 23 March 1997 /
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

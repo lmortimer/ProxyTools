@@ -1,0 +1,407 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>Getting Started with HTTPClient</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="index.html">
+<LINK REL="Next"     HREF="advanced_info.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+
+<H1>Getting Started with HTTPClient</H1>
+
+<H2>Contents</H2>
+
+<UL>
+<LI><A HREF="#sending">Sending Requests</A>
+<LI><A HREF="#example">Example Applet</A>
+<LI><A HREF="#auth">Authorization Handling</A>
+<LI><A HREF="#redir">Redirections</A>
+<LI><A HREF="#cookies">Cookies</A>
+<LI><A HREF="#parsing">Parsing Header Fields</A>
+<LI><A HREF="#urlcon">Replacing the JDK's HttpClient</A>
+<LI><A HREF="#hotjava">Using the HTTPClient with HotJava</A>
+</UL>
+
+
+<H2><A NAME="sending">Sending Requests</A></H2>
+
+<P>Using the HTTPClient should be quite simple. First add the import
+statement <code>import HTTPClient.*;</code> to your file(s). Next you
+create an instance of <A
+HREF="api/HTTPClient/HTTPConnection.html">HTTPConnection</A> (you'll
+need one for every server you wish to talk to). Requests can then be
+sent using one of the methods <A
+HREF="api/HTTPClient/HTTPConnection.html#Head(java.lang.String)">Head()</A>,
+<A
+HREF="api/HTTPClient/HTTPConnection.html#Get(java.lang.String)">Get()</A>,
+<A
+HREF="api/HTTPClient/HTTPConnection.html#Post(java.lang.String)">Post()</A>,
+etc in <A
+HREF="api/HTTPClient/HTTPConnection.html">HTTPConnection</A>.  These
+methods all return an instance of <A
+HREF="api/HTTPClient/HTTPResponse.html">HTTPResponse</A> which has
+methods for accessing the response headers (<A
+HREF="api/HTTPClient/HTTPResponse.html#getHeader(java.lang.String)">getHeader()</A>,
+<A
+HREF="api/HTTPClient/HTTPResponse.html#getHeaderAsInt(java.lang.String)">getHeaderAsInt()</A>,
+etc), various response info (<A
+HREF="api/HTTPClient/HTTPResponse.html#getStatusCode()">getStatusCode()</A>,
+<A
+HREF="api/HTTPClient/HTTPResponse.html#getReasonLine()">getReasonLine()</A>,
+etc), the response data (<A
+HREF="api/HTTPClient/HTTPResponse.html#getData()">getData()</A>, <A
+HREF="api/HTTPClient/HTTPResponse.html#getText()">getText()</A>, and
+<A
+HREF="api/HTTPClient/HTTPResponse.html#getInputStream()">getInputStream()</A>)
+and any trailers that might have been sent (<A
+HREF="api/HTTPClient/HTTPResponse.html#getTrailer(java.lang.String)">getTrailer()</A>,
+<A
+HREF="api/HTTPClient/HTTPResponse.html#getTrailerAsInt(java.lang.String)">getTrailerAsInt()</A>,
+etc). Following are some examples to get started.
+
+<P>To retrieve files from the URL "http://www.myaddr.net/my/file" you can
+use something like the following:
+
+<pre>
+    try
+    {
+	HTTPConnection con = new HTTPConnection("www.myaddr.net");
+	HTTPResponse   rsp = con.Get("/my/file");
+	if (rsp.getStatusCode() &gt;= 300)
+	{
+	    System.err.println("Received Error: "+rsp.getReasonLine());
+	    System.err.println(rsp.getText());
+	}
+	else
+	    data = rsp.getData();
+
+	rsp = con.Get("/another_file");
+	if (rsp.getStatusCode() &gt;= 300)
+	{
+	    System.err.println("Received Error: "+rsp.getReasonLine());
+	    System.err.println(rsp.getText());
+	}
+	else
+	    other_data = rsp.getData();
+    }
+    catch (IOException ioe)
+    {
+	System.err.println(ioe.toString());
+    }
+    catch (ParseException pe)
+    {
+	System.err.println("Error parsing Content-Type: " + pe.toString());
+    }
+    catch (ModuleException me)
+    {
+	System.err.println("Error handling request: " + me.getMessage());
+    }
+</pre>
+
+<P>This will get the files "/my/file" and "/another_file" and put their
+contents into byte[]'s accessible via <A
+HREF="api/HTTPClient/HTTPResponse.html#getData()">getData()</A>.
+Note that you need to only create a new <A
+HREF="api/HTTPClient/HTTPConnection.html">HTTPConnection</A> when
+sending a request to a new server (different protocol, host or port);
+although you may create a new <A
+HREF="api/HTTPClient/HTTPConnection.html">HTTPConnection</A> for
+every request to the same server this <strong>not</strong> recommended,
+as various information about the server is cached after the first
+request (to optimize subsequent requests) and persistent connections
+are used whenever possible (see also <A
+HREF="advanced_info.html">Advanced Info</A>).
+
+<P>To POST form data from an applet back to your server you could use
+something like this (assuming you have two fields called <var>name</var>
+and <var>e-mail</var>, whose contents are stored in the variables
+<var>name</var> and <var>email</var>):
+
+<pre>
+    try
+    {
+	NVPair form_data[] = new NVPair[2];
+	form_data[0] = new NVPair("name", name);
+	form_data[1] = new NVPair("e-mail", email);
+
+	// note the convenience constructor for applets
+	HTTPConnection con = new HTTPConnection(this);
+	HTTPResponse   rsp = con.Post("/cgi-bin/my_script", form_data);
+	if (rsp.getStatusCode() &gt= 300)
+	{
+	    System.err.println("Received Error: "+rsp.getReasonLine());
+	    System.err.println(rsp.getText());
+	}
+	else
+	    stream = rsp.getInputStream();
+    }
+    catch (IOException ioe)
+    {
+	System.err.println(ioe.toString());
+    }
+    catch (ModuleException me)
+    {
+	System.err.println("Error handling request: " + me.getMessage());
+    }
+</pre>
+
+<P>Here the response data is read at leisure via an <A
+HREF="api/HTTPClient/HTTPResponse.html#getInputStream()">InputStream</A>
+instead of all at once into a <var>byte[]</var>.
+
+<P>As another example, if you want to upload a document to a URL (and the
+server supports http PUT) you could do something like the following:
+
+<pre>
+    try
+    {
+	URL url = new URL("http://www.mydomain.us/test/my_file");
+
+	HTTPConnection con = new HTTPConnection(url);
+	HTTPResponse   rsp = con.Put(url.getFile(), "Hello World");
+	if (rsp.getStatusCode() &gt= 300)
+	{
+	    System.err.println("Received Error: "+rsp.getReasonLine());
+	    System.err.println(rsp.getText());
+	}
+	else
+	    text = rsp.getText();
+    }
+    catch (IOException ioe)
+    {
+	System.err.println(ioe.toString());
+    }
+    catch (ModuleException me)
+    {
+	System.err.println("Error handling request: " + me.getMessage());
+    }
+</pre>
+
+
+<H2><A NAME="example">Example Applet</A></H2>
+
+<P>Here is a complete (albeit simple) <A HREF="HTTPClientExample.html">
+Applet</A> that uses HTTPClient to POST some data.
+
+
+<H2><A NAME="auth">Authorization Handling</A></H2>
+
+<P>If the server requires authorization the HTTPClient will usually pop
+up a dialog box requesting the desired information (usually username
+and password), much like Netscape or other browsers do. This
+information will then be cached so that further accesses to the same
+realm will not require the information to be entered again. If you (as
+a programmer) know the username and password beforehand (e.g. if you
+are writing an applet to access a specific page on your server) you can
+set this information with the <A
+HREF="api/HTTPClient/HTTPConnection.html#addBasicAuthorization(java.lang.String,
+java.lang.String, java.lang.String)">addBasicAuthorization()</A> and <A
+HREF="api/HTTPClient/HTTPConnection.html#addDigestAuthorization(java.lang.String,
+java.lang.String, java.lang.String)">addDigestAuthorization()</A> methods in <A
+HREF="api/HTTPClient/HTTPConnection.html">HTTPConnection</A>, or via the
+corresponding methods in <A
+HREF="api/HTTPClient/AuthorizationInfo.html">AuthorizationInfo</A>.
+Example:
+
+<pre>
+    HTTPConnection con = new HTTPConnection(this);
+    con.addBasicAuthorization("protected-space", "goofy", "woof");
+</pre>
+
+<P>Note that for applets it is not possible to pick up authorization info
+from the browser (even though I would love to) because this would of
+course constitute a largish security problem (imagine an applet that gets
+all the username/passwords from the browser and sends them back to the
+server...).  This means that the user of an applet might potentially have
+to enter information (s)he's already entered before.
+
+<P>If you are using a proxy which requires authentication then this will
+be handled in the same way as server authentication. However, you will
+need to use the methods from <A
+HREF="api/HTTPClient/AuthorizationInfo.html">AuthorizationInfo</A> for
+setting any authorization info. Example:
+
+<pre>
+    AuthorizationInfo.addBasicAuthorization("my.proxy.dom", 8000, "protected-space", "goofy", "woof");
+</pre>
+
+<P>By default HTTPClient will handle both Basic and Digest authentication
+schemes. For more info on authorization handling see the
+<A HREF="advanced_info.html#auth_mod">AuthorizationModule</A>
+documentation.
+
+
+<H3>Authorization Realms</H3>
+
+<P>All <code>addXXXAuthorization()</code> methods take one argument
+labeled <var>realm</var>. But what is a realm?
+
+<P>Username/Password pairs are associated with realms, not URLs (or more
+precisely, they're associated with the 3-tuple &lt;host, port, realm&gt;).
+This allows the same authorization info to be used for multiple URLs, or
+even whole URL "trees". When a server sends back an "unauthorized" error
+it includes the name of the realm this URL belongs to. The client can
+then look and see whether it has stored a username and password for
+this realm, and if so it will send that info without prompting the user
+(again).  If the info were associated with specific URLs then you would
+have to enter the username and password each time you accessed a
+different URL.
+
+<P>To find out what realm a given URL belongs to you can either access
+the URL with a normal browser and see what realm they give in the popup
+box (in Netscape it says "Enter Username for .... at www.some.host" -
+the .... is the realm), or you can access the URL using the HTTPClient
+(without the <code>addXXXAuthorization()</code> method) and see what
+realm it prints in the popup box (it'll say "Enter username and
+password for realm .... on host www.some.host"). Additionally, I've
+provided a small application <var>GetAuthInfo</var> (in HTTPClient/doc/)
+which will print out the necessary info. If you have direct access to the
+net you can run this as:
+<PRE>
+	java GetAuthInfo http://some.host.dom/the/file.html
+</PRE>
+If you're using an http proxy, use
+<PRE>
+	java -Dhttp.proxyHost=your.proxy.dom -Dhttp.proxyPort=XX GetAuthInfo http://some.host.dom/the/file.html
+</PRE>
+If your proxy requires authentication then the above will instead print
+out the info necessary to authenticate with the proxy. To get the info
+for a server when your proxy requires authentication use the following
+command line:
+<PRE>
+	java -Dhttp.proxyHost=your.proxy.dom -Dhttp.proxyPort=XX GetAuthInfo -proxy_auth proxy-username proxy-password http://some.host.dom/the/file.html
+</PRE>
+
+
+<H2><A NAME="redir">Redirections</A></H2>
+
+<P>Redirections (status codes 301, 302, 303, 305 and 307) are handled
+automatically for the request methods GET and HEAD; other requests are
+not redirected as a redirection might change the conditions under which
+the request was made (this is mandated by <A
+HREF="advanced_info.html#specs">the specs</A>). An exception are the
+302 and 303 response codes - upon receipt of either of these a GET is
+issued to the new location, no matter what the original request method
+was. This is used primarily for scripts which are accessed via POST
+and want to redirect the client to a predetermined response.
+
+<P>If the request was redirected (it may even have been redirected
+multiple times) the final URI that delivered the response can be
+retrieved using the response's <A
+HREF="api/HTTPClient/HTTPResponse.html#getEffectiveURI()">getEffectiveURI()</A>
+method.
+
+
+<H2><A NAME="cookies">Cookies</A></H2>
+
+<P>Cookies are handled automatically. When a response contains a 'Set-Cookie'
+or 'Set-Cookie2' header field, the cookies are parsed and stored; when a
+request is sent, the list is scanned for applicable cookies and those are then
+sent along with the request.
+
+<P>However, because of privacy issues surrounding cookies, a cookie policy
+handler is used to control the accepting and sending of cookies. By default,
+when the server tries to set a cookie a dialog box is brought up to ask the
+user whether the cookie should be accepted. This allows her simple control over
+which cookies are set. For more info on disabling cookies or using your own
+policy handler see the <A HREF="advanced_info.html#cookie_mod">Advanced
+Info</A>.
+
+<P>Cookies may also be saved at the end of the session and loaded again at
+startup. To enable this set the java system property
+<var>HTTPClient.cookies.save</var> to <var>true</var>. Again, see
+<A HREF="advanced_info.html#cookie_mod">Advanced Info</A> for more
+details.
+
+
+<H2><A NAME="parsing">Parsing Header Fields</A></H2>
+
+<P>The <A HREF="api/HTTPClient/Util.html">Util</A> class provides a
+number of methods for handling http header fields. They are mostly based around
+the general header field parser <A
+HREF="api/HTTPClient/Util.html#parseHeader(java.lang.String)">parseHeader()</A>
+which will parse a syntax that fits most http header fields. It's also a very
+loose parser that will accept just about anything as long as it's unambiguously
+parseable. Note however that this parser will <em>not</em> handle the
+WWW-Authenticate or Proxy-Authenticate header fields, as those use a slightly
+different syntax.
+
+
+<H2><A NAME="urlcon">Replacing the JDK's HttpClient</A></H2>
+
+<P>An <A
+HREF="api/HTTPClient/HttpURLConnection.html">HttpURLConnection</A> class
+and the necessary <code>URLStreamHandlers</code> are provided so that you
+may easily replace the JDK's HttpClient with the HTTPClient. All you need
+to do is define the java system property
+<var>java.protocol.handler.pkgs</var> as <var>HTTPClient</var>. For
+example, on the command line this would look like
+<PRE>
+    java -Djava.protocol.handler.pkgs=HTTPClient MyApp
+</PRE>
+Invoking <code>URL.openConnection()</code> will then return an instance
+of <A
+HREF="api/HTTPClient/HttpURLConnection.html">HTTPClient.HttpURLConnection</A>.
+
+<P>Note that there are a couple small differences compared to Sun's
+HttpClient when POSTing - please see the class documentation for more
+information.
+
+
+<H2><A NAME="hotjava">Using the HTTPClient with HotJava</A></H2>
+
+<P>You can also use the HTTPClient to turn HotJava into a fully HTTP/1.1
+compliant browser (contrary to what Sun claims, HotJava does
+<strong>not</strong> do HTTP/1.1 at all). Unfortunately, sometime between
+HotJava 1.1.2 and HotJava 1.1.5 they started setting the system property
+<var>java.protocol.handler.pkgs</var> inside hotjava, overriding any
+settings applied on the command line or in the hotjava properties file.
+The only solution left is to provide a Handler in the package
+sunw.hotjava.protocol.http which points to the HTTPClient. Such a handler
+is provided in the alt/HotJava subdirectory. All that needs to be done
+then is set up the classpath so that this directory precedes all other
+entries.
+
+<H3>HotJava 3.0</H3>
+
+<P>To use the HTTPClient with HotJava 3.0 edit the hotjava.lax properties
+file (in the hotjava installation directory) and change the lax.class.path
+property definition to:
+<PRE>
+  lax.class.path=&lt;HTTPClient-dir&gt;/alt/HotJava:&lt;HTTPClient-dir&gt;:Browser.jar:lax.jar </PRE>
+where &lt;HTTPClient-dir&gt; is the full path to the HTTPClient directory.
+So, assuming you installed the HTTPClient in /home/joe/classes/ then the
+definition would be
+<PRE>
+  lax.class.path=/home/joe/classes/HTTPClient/alt/HotJava:/home/joe/classes/HTTPClient:Browser.jar:lax.jar </PRE>
+
+<H3>HotJava 1.1.5</H3>
+
+<P>This unfortunately requires editing of the hotjava startup script
+itself. In the section "Set Paths" add a third hjclasses line after the
+other two:
+<PRE>
+  hjclasses="&lt;HTTPClient-dir&gt;/alt/HotJava:&lt;HTTPClient-dir&gt;:${hjclasses}" </PRE>
+Again, using the above example installation it would be
+<PRE>
+  hjclasses="/home/joe/classes/HTTPClient/alt/HotJava:/home/joe/classes/HTTPClient:${hjclasses}" </PRE>
+
+
+<P>
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+<HR>
+
+<ADDRESS>
+Ronald Tschal&auml;r / 6. May 2001 /
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

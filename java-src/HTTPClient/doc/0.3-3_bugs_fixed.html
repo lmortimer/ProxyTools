@@ -1,0 +1,290 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>Bugs fixed in V0.3-3</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="index.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>Contents</H1>
+<UL>
+<LI><A HREF="#bugs">Bugs fixed</A>
+<LI><A HREF="#changes">Enhancements</A>
+<LI><A HREF="#upgrading">Upgrading</A>
+</UL>
+
+
+<H1><A NAME="bugs">Bugs fixed in V0.3-3</A></H1>
+
+<P>Here is a list of bugs fixed since the last release (V0.3-2):
+
+<UL>
+<LI>If a response contained a "Content-length: 0" then the client would
+    hang.
+
+<LI>Bug in response parsing fixed: If the Content-Length header contained
+    trailing spaces a NumberFormatException was thrown.
+
+<LI>Bug in authorization handling fixed. If the response to a request
+    which required authorization was a redirect, and the new uri also
+    required authorization, and no auth info had been cached for
+    the new uri, then the client would send the old authorization
+    header to the new uri. This could cause a 400 response if the two
+    uri's used Digest authentication.
+
+<LI>Bug in AuthorizationInfo.addDigestAuthentication() fixed. If that
+    was used, then an ArrayIndexOutOfBoundsException was thrown when
+    a site using Digest authentication was hit.
+
+<LI>Bug in redirection handling fixed: The path part of the new URI
+    was not being correctly encoded before use.
+
+<LI>Bug in redirection handling fixed: if the port for the request was
+    the default port (i.e. 80 for http) then the redirection used a new
+    HTTPConnection instance even though it could've reused the old. This
+    did not affect the correct operation, but it was pointlessly inefficient.
+
+<LI>Bug in CookieModule fixed: discardAllCookies(ctxt) wasn't releasing
+    the context (i.e. it was only removing the cookies, not the complete
+    context).
+
+<LI>Bug in Cookie parsing fixed: a cookie received over a secure connection
+    was always labeled as "secure". While this might make sense from a
+    security standpoint, this is not the way the spec is written. The only
+    way a cookie is marked secure now is if the Set-Cookie contained the
+    "secure" token.
+
+<LI>Problem in Cookie parsing fixed: if a server returned an invalid set-cookie
+    with an empty domain (<code>domain=</code>) then an exception was thrown.
+    The cookie is now just ignored.
+
+<LI>Bug in Cookie parsing fixed: if an illegal expires was sent with no value
+    ("expires=") then an ArrayIndexOutOfBoundsException was thrown.
+
+<LI>Problem in Cookie parsing fixed: if a server returned an rfc-2109 cookie
+    then the last unrecognized attribute was taken as the name and value; in
+    the same vein, if the cookie's name was the same as an attribute (e.g.
+    "path") then that name was ignored, leading to an exception. Now the first
+    name=value encountered is unconditionally used as the cookie name and value.
+    Additionally, in order to handle folks sending rfc-2109 cookies, the Max-Age
+    attribute is recognized and handled.
+
+<LI>Bug in Cookie handling fixed: Set-Cookie2 header lines in trailers were
+    not being read.
+
+<LI>Bug in URI fixed: new URI(new URI("http://a"), "b") was not putting in
+    a '/' (i.e. you got "http://ab" instead of "http://a/b");
+
+<LI>Bug in URI fixed: hashCode() was not overriden, meaning it couldn't
+    be used as a key in java.util.Hashtable.
+
+<LI>Bug in Codecs.mpForDataEncode fixed: if no options or files were
+    being sent then the length was calculated wrong, resulting in an
+    ArrayIndexOutOfBoundsException. Instead, a zero-length byte[] is now
+    returned.
+
+<LI>Bug in Codecs.mpForDataEncode fixed: the FileInputStream's were not being
+    closed.
+
+<LI>Bug when the first request on the socket was large and took a long
+    time. The socket-timeout timer wasn't being put to sleep during this
+    time.
+
+<LI>Bug when the connection was closed/reset after sending a POST but
+    before anything could be read. In this case the POST was automatically
+    being retried even though it shouldn't be.
+
+<LI>CIHashtable.containsKey() was invoking super.contains() instead of
+    super.containsKey() - since CIHashtable is an internal class and
+    that method was never invoked, nothing was affected.
+
+<LI>When talking through an HTTP/1.1 proxy where the proxy sends back an
+    error code (such as when proxy authorization is needed) the client
+    erroneously thought it was talking to an HTTP/1.0 proxy.
+
+<LI>HTTPConnection.setDefaultHeaders() wasn't setting those headers if
+    they contained a "Content-Length" or "Host" header.
+
+<LI>Fixed bug in BufferedInputStream.available(): when the stream had been
+    closed but there was still stuff left in the buffer, the method would
+    throw an IOException - it now returns what's left in the buffer.
+
+<LI>Chunk-length parsing was not very tolerant of spaces. It would handle
+    them as long as the total length of the field was less than 8 bytes.
+    It now ignores any amount of spaces before and after the length.
+
+<LI>Stop the SocketTimeout thread if the StreamDemultiplexor class is
+    gc'd. This is only relevant for applets or special applications which
+    load the HTTPClient classes multiple times with different classloaders.
+
+<LI>Fixed bug in Request.java where absolute URI's were being prepended with
+    a '/'. This was visible for instance when using proxies and https: the
+    client was sending "CONNECT /www.foo.bar:443 ..." instead of "CONNECT
+    www.foo.bar:443 ..."
+
+<LI>URI has been revamped to because it was horribly broken with respect to
+    escaping. All elements are now stored in escaped form, and the constructors
+    have been clarified as to what they expect. Furthermore, the escaping and
+    unescaping has been enhanced to UTF8-encode/decode non-ASCII characters.
+
+<LI>URI.toExternalForm() now UTF-8-encodes non-ASCII characters.
+    Previously it did not encode ISO8859-1 characters, and threw an
+    exception for characters &gt; 255. Also, when unescaping encoded
+    UTF-8 characters are detected and decoded.
+
+
+</UL>
+
+
+<H1><A NAME="changes">Enhancements and workarounds</A></H1>
+
+<P>A number of enhancements and changes have been incorporated into this bug
+fix too:
+
+<UL>
+<LI>Support for JDK 1.0.2 has been dropped, and all uses of deprecated
+    methods replaced except for two.
+
+<LI>Some private fields of inner classes have been made package
+    protected. This is to allow the classes to be compiled under
+    JDK 1.1.x (which has a bug in this area).
+
+<LI>Made Cookie parsing more lenient: missing value parts in the
+    NAME=VALUE are now tolerated.
+
+<LI>URI now handles IPv6 addresses
+
+<LI>URI.getPath() has been renamed URI.getPathAndQuery(); URI.getPath()
+    now only returns the path.
+
+<LI>URI now has a flag ENABLE_BACKWARDS_COMPATIBILITY to enable backwards
+    compatible parsing with old parsers. This flag is set to true in
+    compiled classes in the distributions.
+
+<LI>HTTPConnection.setDefaultHeaders() and the request methods now
+    gracefully handle null elements in the NVPair[] by ignoring them.
+
+<LI>Cookie parsing will now try to handle invalid cookies which contain
+    a comma in the cookie value.
+
+<LI>When a Set-Cookie contains no path, the spec says it defaults to the
+    path of the resource being requested. However, that's not what the
+    Netscape browser actually does. Instead it takes the path up to (but
+    not including) the last '/'. Since some sites expect this behaviour,
+    the Cookie class has been changed to follow this behaviour.
+
+<LI>Cookie parsing now accepts quotes around the expires value - Netscape
+    accepts this, and some sites actually send it.
+
+<LI>Cookie2 handling now updated to rfc-2965 .
+
+<LI>The response header parser will now ignore duplicates of headers
+    which only allow a single value (i.e. whose values can't be
+    concatenated with a ',').
+
+<LI>Made Codecs.mpForDataEncode more robust: it ignores null entries in the
+    opts and files parameters.
+
+<LI>Codecs.mpForDataEncode now adds Content-Type headers to the parts
+    containing file names. Some broken server scripts seem to require
+    this.
+
+<LI>Boundary string generated by Codecs.mpForDataEncode has been adjusted
+    to always contain 10 leading '-'s - would you believe it? Some scripts
+    require this...
+
+<LI>When parsing URI's, escape characters (%'s) which aren't followed by
+    a valid 2-digit number are now treated as normal %'s instead of
+    throwing a ParseException.
+
+<LI>The idempotent-sequence checker for retries now knows about the WebDAV
+    methods.
+
+<LI>Setting a timeout now affects reading the response body too. This was
+    previously disabled on purpose because of the problem that not all
+    streams are restartable after an InterruptedIOException. However, it
+    seems most people want to abort the request when this happens anyway,
+    hence this change. The old behaviour can be restored by setting the
+    java system property HTTPClient.dontTimeoutRespBody to true.
+
+<LI>Added another constructor to HTTPConnection which takes a URI.
+
+<LI>Added another constructor to HTTPConnection which takes a local address
+    and port to bind to.
+
+<LI>Added a Log class. Debug messages can now be turned on and off dynamically
+    instead of requiring recompilation.
+
+<LI>The Host header field is now settable by the application, i.e. it is not
+    removed anymore if present in a <code>con.setDefaultHeaders(...)</code>
+    or as part of the request. In general applications should not set that
+    header field unless they really need to provide a value other than the
+    host name provided to the constructor of the HTTPConnection.
+
+<LI>The authorization challenge parsing has been munged to deal with the broken
+    and invalid auth headers sent by M$ servers.
+
+<LI>Added an AuthorizationPrompter to the DefaultAuthHandler (and made that
+    class public) in order to allow folks to easily replace the default popup
+    box, and in order to facilitate certain hacks.
+
+<LI>Added <A
+    HREF="api/HTTPClient/HTTPResponse.html#retryRequest()">HTTPResponse.retryRequest()</A>
+    in order to help handling of requests which used an HttpOutputStream.
+
+<LI>Added convenience method <A
+    HREF="api/HTTPClient/HTTPResponse.html#getText()">HTTPResponse.getText()</A>
+    in order to help prevent folks from getting it wrong.
+
+<LI>Minor change to redirection handling for 302 response codes: a 302 is
+    now only treated as a 303 if the request method was POST or PUT. For
+    all others it is treated like a 302 should be according to the spec.
+    This only impacts folks using methods from WebDAV, IPP, etc, who will
+    now get that 302 returned to them instead of having the request
+    automatically resent as a GET (which is probably not what they wanted
+    in the first place).
+
+</UL>
+
+
+<H1><A NAME="upgrading">Upgrading from Version 0.3-2</A></H1>
+
+<P>V0.3-3 should be plug-in compatible with V0.3-2 (i.e. no changes to
+your code are required), with following three exceptions:
+<ol>
+<li>if you're running under JDK 1.0.2 then the current code won't work
+    anymore. Sorry.
+<li>if the application used timeouts and relied on the fact that these
+    were disabled while reading the response body, then you must now
+    run the application with
+    <pre>
+      java -DHTTPClient.dontTimeoutRespBody=true ...
+    </pre>
+<li>If your application used the URI class directly, then it will probably
+    need updating. Specifically, replace all invocations of
+    <code>URI.getPath()</code> with <code>URI.getPathAndQuery()</code>.
+    Furthermore you may want to unescape the values returned by
+    <code>getPath()</code>, <code>getPathAndQuery()</code>, etc, as the URI
+    class now stores and returns all elements in the escaped form instead of
+    their unescaped form.
+</ol>
+
+
+<P>
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+
+
+<HR>
+<ADDRESS>
+Ronald Tschal&auml;r / 6. May 2001 / 
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

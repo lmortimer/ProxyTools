@@ -1,0 +1,208 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>HTTPS Support</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="index.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+
+<H1>HTTPS (HTTP over SSL) Support</H1>
+
+<P>Even though support for https has been one of the most requested
+features, it has still not been added in yet. This is mainly due to the
+lack of a suitable SSL implementation (where suitable means freely
+available under some sort of opensource license, pure Java, and without
+export restrictions). However, a number of patches for various commercial
+and partially free SSL packages have been provided by various people (who
+all deserve a big thank you). Below is the list of patches available.
+Note: I suggest you check the <A
+HREF="http://www.innovation.ch/java/HTTPClient/https.html"> copy of this
+page</A> on the HTTPClient web site, as that will be more up-to-date.
+
+<P>All patches include the modified HTTPConnection.java, the resulting
+class files, and a README. Note that the patches are not included in the
+HTTPClient distributions themselves because of export/import regulations
+in various countries. However, they are all available from the HTTPClient
+home site, which resides in Switzerland and therefore has no export
+problems.
+
+<P>If you have not settled on an SSL implementation yet and are choosing
+between one of those listed below, then I recommend JSSE, SSL-J,
+iSaSiLk, or SSLava, because they have the necessary constructor or other
+hook so that the HTTPClient will work through proxies; the others do not
+provide the necessary constructors or hooks and therefore when using
+these the HTTPClient will not work through proxies for https
+connections. Note that I have no connection whatsoever with these
+companies - I just happen to have received info and patches for these
+packages from folks who had used them to add https support to the
+HTTPClient.
+
+
+<H2>https Examples</H2>
+
+Once you've patched the HTTPClient and added the ssl libraries to your
+classpath, creating an https connection is simple:
+
+<PRE>
+    HTTPConnection con = new HTTPConnection("https", "www.myaddr.net", -1);
+    ...
+</PRE>
+
+You can also use URL's, but you need to define the property
+<code>java.protocol.handler.pkgs=HTTPClient</code> so that creating the
+URL won't throw a MalformedURLException:
+
+<PRE>
+    System.getProperties().put("java.protocol.handler.pkgs", "HTTPClient");
+    URL url = new URL("https://www.myaddr.net/the/stuff");
+    HTTPConnection con = new HTTPConnection(url);
+    ...
+</PRE>
+
+Alternatively, use the URI class from the HTTPClient:
+
+<PRE>
+    URI url = new URI("https://www.myaddr.net/the/stuff");
+    HTTPConnection con = new HTTPConnection(url.getScheme(), url.getHost(), url.getPort());
+    ...
+</PRE>
+
+
+<H2>SSL Implementations and Patches</H2>
+
+<H3><A NAME="SSLJ" HREF="http://www.rsasecurity.com/products/bsafe/sslj.html">SSL-J</A> (from RSA)</H3>
+
+<P>SSL-J is commercial; the patched HTTPClient is capable of doing https
+through proxies. Thanks to Jon Lennard and Chaitanya Laxminarayan for the patches.
+<P><A HREF="http://www.innovation.ch/java/HTTPClient/SSLJ3.zip">Patches for SSL-J version 3.0 (or later)</A>
+<BR><A HREF="http://www.innovation.ch/java/HTTPClient/SSLJ2.zip">Patches for SSL-J versions prior to 3.0</A>
+
+<H3><A NAME="SSLava" HREF="http://www.phaos.com/products/sslava.htm">SSLava</A> (from Phaos)</H3>
+
+<P>SSLava is commercial; the patched HTTPClient is capable
+of doing https through proxies. Thanks to Josh Bers for the patch.
+<P><A HREF="http://www.innovation.ch/java/HTTPClient/SSLava.zip">Download patches</A>
+
+<P><em>Note:</em> the patch above has been updated to work against what
+seems to be the current SSLava version. If you have an older version of
+SSLava and are having problems with the patch, then try downloading
+<A HREF="http://www.innovation.ch/java/HTTPClient/SSLava.old.zip">the older patches</A>
+
+<H3><A NAME="IAIK" HREF="http://jcewww.iaik.tu-graz.ac.at/iSaSiLk/iSaSiLk.htm">iSaSiLk</A> (from IAIK)</H3>
+
+<P>iSaSiLk is commercial; the patched HTTPClient is partially capable
+of doing https through proxies (http proxies are ok, SOCKS proxies
+aren't handled). Thanks to Scott Murray for the info from which this
+patch was created.
+
+<P>Note: Entrust is distributing a security
+<A HREF="http://www.entrust.com/developer/java/index.htm">toolkit</A> which
+is free for some uses. This package includes the above IAIK SSL
+implementation, and hence the patches here can be used with Entrust's
+toolkit.
+
+<P><A HREF="http://www.innovation.ch/java/HTTPClient/SSLiaik.zip">Download patches</A>
+
+<H3><A NAME="NJSS" HREF="http://home.netscape.com/download/prodinfonfs_102.html">NJSS</A> (from Netscape)</H3>
+
+<P>NJSS is commercial; the patched HTTPClient is <em>not</em> capable
+of doing https through proxies. Thanks to J. Scott Evans for the patch.
+<P><A HREF="http://www.innovation.ch/java/HTTPClient/SSLnjss.zip">Download patches</A>
+
+<H3><A NAME="JSSE" HREF="http://java.sun.com/products/jsse/">JSSE</A> (from Sun)</H3>
+
+<P>This is a pure java implementation of the latest javax.net.ssl spec.
+DSTC also <A HREF="http://security.dstc.edu.au/projects/java/jcsi.html">
+provides an implementation</A> of this interface, which is free for
+non-commercial use. The patched HTTPClient is capable of doing https
+through proxies.
+
+<P><A HREF="http://www.innovation.ch/java/HTTPClient/JSSE.zip">Download
+patches</A>
+
+<H3><A NAME="SUN" HREF="http://java.sun.com/security/ssl/API_users_guide.html">Old javax.net.ssl</A> (from Sun)</H3>
+
+<P>Sun's implementation of this interface delivered with <A
+HREF="http://java.sun.com/products/hotjava/1.1.5/">HotJava 1.1.5</A> is
+free (at the time of this writing there is no SSL-enabled version of
+HotJava 3.0); others seem to be commercial; the patched HTTPClient is
+<em>not</em> capable of doing https through proxies.
+
+<P><A HREF="http://www.innovation.ch/java/HTTPClient/SSLsun.zip">Download
+patches</A>
+
+<H3><A NAME="SUN" HREF="http://www.openssl.org/">OpenSSL</A></H3>
+
+<P>A few people have written Java wrappers around OpenSSL and have
+provided patches for the HTTPClient. Here are the ones I'm aware of:
+
+<UL>
+<LI>Matt Warner's
+    <A HREF="http://www.warnertechnology.com/Computers/Software/JavaOpenSSL.shtml">wrapper info</A>
+    (patches for the HTTPClient are at the end of the page).
+    This is currently mainly Mac OS X based, but should be portable
+    to any Unix.
+<LI>Martin Büchler's <A HREF="SSLJava-0.1.zip">wrapper for Win32</A>
+    (with a patched HTTPConnection.java).
+</UL>
+
+Note that neither of these support SSL through proxies.
+
+<H3>Other SSL packages</H3>
+
+<P>Here are some SSL packages which I know of, but for which I do not
+have any patches:
+
+<UL>
+<LI><A HREF="http://www.bpsinfo.com/javassl/">Java SSL</A>
+<LI><A HREF="http://www.vonnieda.org/SSLv3/">EspreSSL</A>
+</UL>
+
+
+<H3>Using Other SSL Implementations</H3>
+
+<P>If you have an SSL implementation which is not listed above and which
+you'd like to use, then must make the following modifications to
+HTTPConnection.java:
+
+<UL>
+<LI>Uncomment (and suitably modify) the line
+    <PRE>
+	sock = new SSLSocket(sock); </PRE>
+
+<LI>Chang the line
+    <PRE>
+	if (!prot.equals("http")) </PRE>
+    to read
+    <PRE>
+	if (!prot.equals("http")  &&  !prot.equals("https")) </PRE>.
+</UL>
+
+<P>Note that you'll need an SSL implementation with a constructor
+which takes an already established socket (this is because the
+HTTPClient needs to create the raw connection itself, possibly
+going through SOCKS or http proxies, and only then can the SSL
+handshake be invoked). As an alternative, a startHandshake()
+or equivalent method will also do - see the <A HREF="#IAIK">IAIK</A>
+implementation. If the SSL package provides neither option then
+the client will not work through proxies.
+
+
+<P>
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+<HR>
+
+<ADDRESS>
+Ronald Tschal&auml;r / 6. May 2001 /
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

@@ -1,0 +1,62 @@
+
+<HTML>
+<HEAD>
+<TITLE>Applet Origin Host</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="security.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>How to determine the Host an Applet is loaded from</H1>
+
+<P>Where an applet is loaded from is determined as follows.  If you
+have a codebase attribute in the applet tag and if the codebase
+contains a full url (i.e. including a host) then this host is where the
+applet is loaded from; otherwise the host is the same one as where the
+page containing the applet tag was loaded from. Note that any proxy
+servers that might have been used to make the connection to the final
+host that serves the applet are not considered in determining where the
+applet was loaded from - only the final host counts.
+
+<P>Here are some examples. Assuming these tags are embedded in a page
+that resides on www.page-server.org, then given:
+
+<BLOCKQUOTE><PRE>
+&lt;APPLET CODE="myclass.class" WIDTH=10 HEIGHT=10&gt;
+&lt;/APPLET&gt;
+</PRE></BLOCKQUOTE>
+
+<P>myclass is loaded from www.page-server.org. Given
+
+<BLOCKQUOTE><PRE>
+&lt;APPLET CODEBASE="/home/goofy/jav"
+        CODE="myclass.class" WIDTH=10 HEIGHT=10&gt;
+&lt;/APPLET&gt;
+</PRE></BLOCKQUOTE>
+
+<P>again, myclass is loaded from www.page-server.org. However with
+
+<BLOCKQUOTE><PRE>
+&lt;APPLET CODEBASE="http://www.applet-server.org/home/goofy/jav"
+        CODE="myclass.class" WIDTH=10 HEIGHT=10&gt;
+&lt;/APPLET&gt;
+</PRE></BLOCKQUOTE>
+
+<P>myclass is loaded from www.applet-server.org.
+
+
+<P>
+<A HREF="security.html">
+<IMG SRC="images/back.gif" ALT="[security]"></A>
+<HR>
+
+<ADDRESS>
+Ronald Tschal&auml;r / 30. January 1998 /
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

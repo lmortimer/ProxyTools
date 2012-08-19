@@ -1,0 +1,66 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>Common Exceptions</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="index.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>Common Exceptions</H1>
+
+<P>Many exceptions should be self explanatory. However here are some common
+exceptions that can be thrown by HTTPClient (they're all subclasses of
+java.io.IOException) and for which the true cause might not be obvious.
+
+<DL>
+
+<DT>java.net.SocketException: Connection refused
+<DD>(connecting to the local host) The server is not running (nobody
+    is listening on the specified port).
+
+<DT>java.net.SocketException: Invalid argument
+<DD>(connecting to a different host) The server is not running (nobody
+    is listening on the specified port).
+<DD>(connecting to a different host) The host is not reachable.
+
+<DT>java.net.UnknownHostException: <var>host</var>
+<DD>The host name <var>host</var> could not be translated to an IP-address.
+    This most often occurs if you are behind a corporate firewall and the
+    system is set up such that you can't resolve names of hosts outside the
+    firewall. In most of these cases you need to be going through a proxy
+    anyway, so configure the HTTPClient to use the proxy.
+
+<DT>java.net.SocketException: Connection reset by peer
+<DD>The server abrubtly aborted the connection. The reason could be almost
+    anything. Check that you are sending the appropriate request (method,
+    headers, etc) and that there is indeed an http server listening at the
+    specified host and port.
+
+<DT>java.net.SocketException: Malformed reply from SOCKS server
+<DD>The SOCKS server refused the connection.
+<DD>The SOCKS server is running version 5; the JDK currently only
+    supports version 4.
+
+</DL>
+
+<P>If you have any further exceptions that you think should be listed here,
+please <A HREF="mailto:ronald@innovation.ch">let me know</A>.
+
+
+<P>
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+<HR>
+
+<ADDRESS>
+Ronald Tschal&auml;r / 6. May 2001 /
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

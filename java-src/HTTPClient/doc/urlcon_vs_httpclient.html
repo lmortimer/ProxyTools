@@ -1,0 +1,96 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>URLConnection vs. HTTPClient</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="index.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>A Comparison of java.net.URLConnection and HTTPClient</H1>
+
+<P>Since java.net.URLConnection and HTTPClient have overlapping
+functionalities, the question arises of why would you use HTTPClient.
+Here are a few of the capabilites and tradeoffs.
+
+<P>Note that if you're running an applet, then things depend on which
+browser you're running under, as the browser provides the actual client
+implementation used by URLConnection; therefore the following just lists
+the differences as compared to Sun's http client (which is the default
+client used by URLConnection in applications).
+
+<P><TABLE BORDER=3 BGCOLOR="#FAF0E6">
+<TR><TH>&nbsp;</TH>
+  <TH><P>URLConnection</TH>
+  <TH><P>HTTPClient</TH>
+<TR><TH><P>Methods</TH>
+  <TD><P>Only HEAD, GET, POST, PUT, DELETE, TRACE and OPTIONS.
+  <TD><P>Has HEAD, GET, POST, PUT, DELETE, TRACE and OPTIONS, plus any
+      arbitrary method, such as those from WEBDav and IPP.
+<TR><TH><P>Response Codes</TH>
+  <TD><P>The response code, headers, and body can only be read if the
+      response code was less than 400 - for any 4xx or 5xx response code,
+      you only get IOException's when trying to get any response info.
+  <TD><P>The response code, all headers, and the body can always be read
+      normally.
+<TR><TH><P>Proxies and SOCKS</TH>
+  <TD><P>Full support (SOCKS: Version 4 only)
+  <TD><P>Full support (SOCKS: both version 4 and 5)
+<TR><TH><P>Authorization</TH>
+  <TD><P>Support for Basic and an early version of Digest in JDK 1.2 or
+      later, only. The current version of Digest authentication (which
+      is the one supported by most servers) is not supported, and due to
+      a bug of theirs they won't even recognize the digest info returned
+      by Apache.
+  <TD><P>Support for Basic and Digest Authentication; other schemes can be
+      added.
+<TR><TH><P>Cookies</TH>
+  <TD><P>No.
+  <TD><P>Yes.
+<TR><TH><P>True request output streams</TH>
+  <TD><P>No - all data is fully buffered before it is sent.
+  <TD><P>Yes - HttpOutputStream will stream directly to the socket.
+<TR><TH><P>True response input streams</TH>
+  <TD><P>Under JDK 1.2, yes; under JDK 1.3 only if the response is not
+      sent using the chunked encoding (this excludes most server-push
+      responses).
+  <TD><P>Yes.
+<TR><TH><P>Persistent Connections</TH>
+  <TD><P>HTTP/1.0 Keep-Alive's in JDK 1.1 and JDK 1.2; JDK 1.3 has
+      HTTP/1.1 persistence.
+  <TD><P>Supports HTTP/1.0 Keep-Alive's and HTTP/1.1 persistence.
+<TR><TH><P>Pipelining of Requests</TH>
+  <TD><P>No.
+  <TD><P>Yes.
+<TR><TH><P>Can set Timeouts</TH>
+  <TD><P>No.
+  <TD><P>Yes.
+<TR><TH><P>Can handle protocols other than HTTP</TH>
+  <TD><P>Yes (e.g. ftp, gopher, mailto, and file are provided)
+  <TD><P>No.
+<TR><TH><P>Can do HTTP over SSL (https)</TH>
+  <TD><P>Appropriate SSL package (such as JSSE) which provides an
+      appropriate client must be installed.
+  <TD><P>Patches are available for various free and commercial SSL packages
+<TR><TH><P>Source code available</TH>
+  <TD><P>No.
+  <TD><P>Yes.
+</TABLE>
+
+
+<P>
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+<HR>
+
+<ADDRESS>
+Ronald Tschal&auml;r / 6. May 2001 /
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

@@ -1,0 +1,85 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>Compiling the HTTPClient</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="index.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>Compiling the HTTPClient</H1>
+
+<P>Here a few common things you may encounter when you attempt to compile
+parts of the HTTPClient.
+
+<UL>
+<LI>JDK 1.1 or later required
+    <P>You need to compile the classes using JDK 1.1 or later; the classes
+    will not compile under JDK 1.0.2.
+    <P>
+
+<LI>deprecation warnings
+    <P>These can be safely ignored. The two places where deprecated API's
+    are used are:
+    <ol>
+    <li><code>Cookie.java</code>: the constructor '<code>new Date(...)</code>'
+        is used because I need a flexible date parser to handle all the
+	(broken) date formats used out there. Note that 
+	java.text.SimpleDateFormat doesn't even begin to cut it because it's
+	far too restrictive, and I don't feel like writing my own parser
+	(i.e. subclass of java.text.DateFormat) right now.
+    <li><code>CookieModules.java</code>:
+	'<code>System.runFinalizersOnExit(...)</code>' is deprecated as of
+	JDK 1.2. However, I need it to save the cookies at exit time.
+	JDK 1.3 has a better solution, but until everybody has switched
+	to that I'm stuck.
+    </ol>
+    <P>
+
+<LI>errors about XXX.java actually containing HTTPClient.XXX
+    <P>As with using the HTTPClient, all the sources must be in a directory
+    called HTTPClient and the CLASSPATH must point to the directory which
+    contains the HTTPClient directory (i.e. it must point to one level
+    above the sources).
+    <P>
+
+<LI>errors of the form: <code>.../HTTPClient/XXX.java: Class
+    HTTPClient/XXX already defined in .../HTTPClient/XXX.java</code>
+    <P>This happens in some versions of JDK 1.1.x and is a bug in the compiler.
+    Either use a different version of JDK 1.1, to JDK 1.2, or create a
+    separate source directory, move the sources into there, and compile the
+    classes into the actual HTTPClient directory (using the <var>-d
+    &lt;directory&gt;</var> option to javac).
+    <P>
+
+<LI>makefile
+    <P>A makefile is provided. However, it's set up for my Linux environment,
+    so you'll need to tweak the definitions at the beginning appropriately.
+    If you're using M$ then you'll probably need to change a number of things;
+    however, the dependencies should be ok.
+    <P>
+
+<LI>Ant build files
+    <P>A couple folks have kindly provided build files for use with Jakarta-Ant:
+    <A HREF="build_1.xml">build_1.xml</A> and <A HREF="build_2.xml">build_2.xml</A>.
+    They are provided as is, and you will probably want to tweak them to suit
+    your needs.
+    <P>
+</UL>
+
+<P>
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+<HR>
+
+<ADDRESS>
+Ronald Tschal&auml;r / 6. May 2001 /
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

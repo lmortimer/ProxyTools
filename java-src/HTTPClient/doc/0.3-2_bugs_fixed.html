@@ -1,0 +1,117 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>Bugs fixed in V0.3-2</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="index.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>Contents</H1>
+<UL>
+<LI><A HREF="#bugs">Bugs fixed</A>
+<LI><A HREF="#changes">Enhancements</A>
+<LI><A HREF="#upgrading">Upgrading</A>
+</UL>
+
+
+<H1><A NAME="bugs">Bugs fixed in V0.3-2</A></H1>
+
+<P>Here is a list of bugs fixed since the last release (V0.3-1):
+
+<UL>
+<LI>Bug in cookie data parsing fixed. This could cause cookies to be
+    overlooked when the server sent multiple cookies with dates that
+    didn't contain a weekday.
+
+<LI>If saving of cookies was enabled and the cookie jar did not exist
+    then no cookies were saved (i.e. the file was not created). It
+    now creates the file if it doesn't exist.
+
+<LI>Bug in ContentEncodingModule fixed: it was trying to uncompress
+    partial contents (206 responses to a range request).
+
+<LI>Deadlock problem in timeout thread fixed. Bad ordering of lock
+    acquisition in the timeout thread could cause a multithreaded
+    app to hang.
+
+<LI>Fixed infinite loop in RetryModule. When a site was not sending a
+    full set of headers (due to a bug of theirs or a network problem)
+    the RetryModule would go into an infinite loop.
+
+<LI>AuthorizationInfo.addDigestAuthorization() now preserves any
+    previous info for that host/realm (such as the list of url's
+    which make up that authentication space).
+
+<LI>Empty paths (e.g. as in a "Location: http://www.cool.dom") were
+    not converted to "/" for the request, leading to invalid http
+    requests. This mostly happened when handling redirections.
+
+</UL>
+
+
+<H1><A NAME="changes">Enhancements and workarounds</A></H1>
+
+<P>A few small enhancements have been incorporated into this bug fix
+too:
+
+<UL>
+
+<LI>HttpURLConnection makes better use of HttpOutputStream when a
+    Content-Length request header is set. See the updated
+    <A HREF="api/HTTPClient.HttpURLConnection.html">javadocs</A>
+    for this class for an example.
+
+<LI>A new java system property <var>HTTPClient.dontChunkRequests</var>
+    has been added. This will prevent the client from using the
+    chunked transfer encoding on requests. Instead, the client will
+    buffer the data if necessary.
+
+<LI>M$ WinSock has a bug when trying to do large writes. This seems
+    to only be visible on JDK 1.1 (i.e. JDK 1.2 seems to work around
+    it). Therefore the following workaround has been added: if the
+    HTTPClient runs under Windoze and the JDK version 1.1(.x) then
+    all writes to the socket will be split into multiple writes of 20K
+    (or less).
+
+<LI>HTTPConnection now has a new method,
+    <A HREF="api/HTTPClient.HTTPConnection.html#isCompatibleWith(HTTPClient.URI)">isCompatibleWith(URI)</A>,
+    to ease the job of managing a cache of HTTPConnection's.
+
+<LI>HTTPConnection now has a new convenience method,
+    <A HREF="api/HTTPClient.HTTPConnection.html#dontProxyFor(java.lang.String[])">dontProxyFor(String[])</A>,
+    which takes a list of hosts.
+
+<LI>Added the HTTPClient/alt/HotJava directory and added an explanation
+    in <A HREF="getting_started.html#hotjava">Getting Started</A> about
+    how to set up things to get HotJava to use the HTTPClient instead
+    of the default client from Sun. Also, the sun.net.ProgressEntry and
+    sun.net.www.MeteredStream hacks were removed from the standard
+    HTTPResponse and HttpURLConnection classes.
+
+</UL>
+
+
+<H1><A NAME="upgrading">Upgrading from Version 0.3-1</A></H1>
+
+<P>V0.3-2 should be plug-in compatible with V0.3-1. I.e. no changes to
+your code are required.
+
+
+<P>
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+
+
+<HR>
+<ADDRESS>
+Ronald Tschal&auml;r / 18. June 1999 / 
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+

@@ -1,0 +1,219 @@
+
+<HTML>
+
+<HEAD>
+<TITLE>Emulating HTML Forms</TITLE>
+<LINK REV="made"     HREF="mailto:ronald@innovation.ch">
+<LINK REL="Previous" HREF="index.html">
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<H1>Emulating HTML Form Submissions using the HTTPClient</H1>
+
+<P>Many folks are attempting to use the HTTPClient to mimick a browser
+submitting form data. While the transformation from html to code is
+really quite straightforward, it assumes a minimal knowledge of html.
+So, the best place to start is get an understanding of html - the specs
+are available from w3.org:
+<UL>
+    <LI><A HREF="http://www.w3.org/MarkUp/">HTML Home Page at W3</A>,
+    <LI><A HREF="http://www.w3.org/TR/REC-html32">HTML-3.2</A>,
+    <LI><A HREF="http://www.w3.org/TR/html4/">HTML-4.01</A>,
+    <LI><A HREF="http://www.w3.org/TR/html4/interact/forms.html">Forms in HTML-4.01</A>,
+</UL>
+
+The HTML-4.01 section on forms gives a good introduction.
+
+<P>In order to make this easier however, this doc attempts to explain
+more specifically how to create the necessary code using the HTTPClient
+in order duplicate what a browser would send when you submit a given
+form. What follows here is not meant to be exhaustive - if you see
+something in your form that is not explained here, then please refer to
+the html specs.
+
+<P>For the rest of this document, I'm going to assume you've got a page
+under the URL <var>http://www.some.org/some/form.html</var> which
+contains an html form whose submission you want to emulate in java
+code. Html tag and attribute names are case insensitive, so while I'll
+always use uppercase for these (i.e. <var>FORM</var> or
+<var>NAME=</var>), they may appear in a different case in the actual
+html you're aiming at emulating (but note that the <em>values</em> are
+<em>not</em> case insensitive, i.e. if you see a <var>NAME=UsEr</var>
+then you must send the string "UsEr" using that exact case).
+
+
+<H2>Finding and Interpreting the FORM tag</H2>
+
+<P>The first thing to do is to find the beginning and the end of the
+form you're interested in. The beginning is marked with a
+<tt>&lt;FORM&nbsp;...&gt;</tt>, and the end with a
+<tt>&lt;/FORM&gt;</tt>. There may be multiple forms in the document,
+so make sure you pick the one you're actually interested in (this can be
+achieved either by counting the forms and picking the n-th one, or by
+looking at which input fields the form contains and making sure it
+contains the ones you're interested in).
+
+<P>The start tag has the general form
+
+<DIV align=center><tt>&lt;FORM ACTION="some/url" METHOD="method" ENCTYPE="enc-type"&gt;</tt></DIV>
+
+There may be additional attributes (but they're not of interest here),
+and the METHOD and/or ENCTYPE may be missing.
+
+<P>The ACTION attribute specifies the URL to which to send the form
+data; it is taken relative to the document's URL. If you are unsure how
+to contruct the resulting URL, you can use the <A
+HREF="api/HTTPClient/URI.html">URI</A> class to do so:
+<PRE>
+	URI doc_url  = new URI("http://www.some.org/some/form.html");
+	URI form_url = new URI(doc_url, "some/url");
+</PRE>
+
+<P>The METHOD attribute describes the method to use; it can take the
+values GET or POST. If it is missing, GET is assumed. As the name
+implies, this is the method you must use when posting the form data.
+
+<P>The ENCTYPE attribute specifies the content-type (and therefore the
+encoding) for the data to be sent. If not present, the default is
+"application/x-www-form-urlencoded", which is what will be used if you
+create an array of <A HREF="api/HTTPClient/NVPair.html">NVPair</A>'s
+and pass them to the Get or Post method of HTTPConnection.
+The other popular value is "multipart/form-data" - if you see that, you
+can use the <A
+HREF="api/HTTPClient/Codecs.html#mpFormDataEncode(HTTPClient.NVPair[], HTTPClient.NVPair[], HTTPClient.NVPair[])">Codecs.mpFormDataEncode()</A>
+to correctly encode the form data.
+
+<H2>The INPUT tags</H2>
+
+<P>All the actual data to be entered and submitted is specified by INPUT
+tags. These have the form
+
+<DIV align=center><tt>&lt;INPUT TYPE="type" NAME="name" VALUE="value"&gt;</tt></DIV>
+
+Again, there may be other attributes, but in general they're not of
+interest here; the VALUE attribute is often missing. For each INPUT tag
+you need to decide whether to create a corresponding NVPair, and if so,
+what name and value to put into it. The name for the NVPair is always
+what's given in the NAME attribute; the value is either what you enter
+in that field or what is in the VALUE attribute.
+
+<P>The type attribute specifies the what kind of element is displayed,
+e.g. an input field, a button, or nothing at all; if missing, the type
+is assumed to be "text". This also determines whether you need to create
+a corresponding NVPair and what to put in its value:
+<DL>
+    <DT>TYPE=text
+    <DD>A simple text field is displayed. An NVPair must always be
+	created for each such input tag, and the NVPair's value is
+	whatever you'd enter in that field (which may be the empty
+	string if nothing is entered).
+    <DT>TYPE=password
+    <DD>A simple password field is displayed - treat this exactly like a
+	TYPE=text.
+    <DT>TYPE=checkbox
+    <DD>A checkbox is displayed. If the box is supposed to be checked,
+	then create an NVPair with the value given in the VALUE
+	attribute; otherwise skip this field. Note that you need to
+	create an NVPair for each checkbox that is selected, even if
+	some of them have the same NAME and/or VALUE attributes.
+    <DT>TYPE=radio
+    <DD>A radio button is displayed. There may be multiple of these with
+	the same name, which creates a group (in which only one of the
+	buttons can be selected at any time). Create an NVPair with
+	value given in the VALUE attribute of that button which is
+	checked; if no buttons are checked, don't create an NVPair for
+	this tag.
+    <DT>TYPE=hidden
+    <DD>Nothing is displayed. Create an NVPair with the name and value
+	as given in the NAME and VALUE attributes.
+    <DT>TYPE=submit
+    <DD>A submit button is displayed. If the tag contains a NAME
+	attribute, then create an NVPair with the name and value as
+	given in the NAME and VALUE attributes; if no NAME attribute is
+	specified, skip this.
+    <DT>TYPE=reset
+    <DD>A reset button is displayed. Ignore this.
+</DL>
+
+<H2>The SELECT and OPTION tags</H2>
+
+<P>These are used to provide a drop down selection box. An NVPair must
+be created with the name from the NAME attribute of the SELECT tag and
+the value of the VALUE attribute of the selected OPTION tag.
+
+
+<H2>The TEXTAREA tag</H2>
+
+<P>This displays a multiline text entry area. An NVPair must created
+with the name from the NAME attribute of this tag, and the value must be
+whatever was entered in the textarea (which may be the empty string if
+nothing was entered).
+
+
+<H1>A Complete Example</H1>
+
+<P>Following is an example form that uses all of the above described
+elements.
+<PRE>
+    &lt;FORM ACTION="/cgi-bin/test" METHOD="POST"&gt;
+    Text: &lt;INPUT NAME="text1"&gt;
+    &lt;BR&gt;&lt;INPUT type=checkbox NAME="ok" VALUE="yes"&gt;Ok?
+    &lt;BR&gt;&lt;INPUT type=checkbox NAME="ok" VALUE="totally"&gt;Really Ok?
+    &lt;BR&gt;&lt;INPUT type=radio NAME="when" VALUE="yesterday"&gt;yesterday
+        &lt;INPUT type=radio NAME="when" VALUE="today"&gt;today
+        &lt;INPUT type=radio NAME="when" VALUE="tomorrow"&gt;tomorrow
+    &lt;INPUT type=hidden NAME="secret" VALUE="data"&gt;
+    &lt;INPUT type=hidden NAME="secret" VALUE="more data"&gt;
+    &lt;INPUT type=hidden NAME="also-hidden" VALUE="data"&gt;
+    &lt;BR&gt;&lt;SELECT NAME="aChoice"&gt;
+	&lt;OPTION VALUE="one"&gt;1
+	&lt;OPTION VALUE="two"&gt;2
+	&lt;OPTION VALUE="three"&gt;3
+	&lt;/SELECT&gt;
+    &lt;BR&gt;&lt;TEXTAREA NAME="comments" ROWS=10 COLS=80&gt;
+	&lt;/TEXTAREA&gt;
+    &lt;BR&gt;&lt;INPUT type=submit VALUE="Doit"&gt;
+    &lt;/FORM&gt;
+</PRE>
+
+<P>Assuming we enter the text "Hell hath no fury..." for the text, we
+check the second checkbox, choose today, select the third option, and
+give no comment, then the resulting code to duplicate this would look
+like the following:
+
+<PRE>
+    // set up the uri according to the action attribute
+    URI form_uri = new URI(doc_uri, "/cgi-bin/test");
+    HTTPConnection con = new HTTPConnection(form_uri);
+
+    // create the NVPair's for the form data to be submitted
+    NVPair[] form_data =
+	new NVPair[] {
+	    new NVPair("text1", "Hell hath no fury...");
+	    new NVPair("ok", "totally");
+	    new NVPair("when", "today");
+	    new NVPair("secret", "data");
+	    new NVPair("secret", "more data");
+	    new NVPair("also-hidden", "data");
+	    new NVPair("aChoice", "three");
+	};
+    
+    // POST the form data, as indicated by the method attribute
+    HTTPResponse rsp = con.Post(form_uri.getPathAndQuery(), form_data);
+</PRE>
+
+<P>
+<A HREF="index.html">
+<IMG SRC="images/back.gif" ALT="[HTTPClient]"></A>
+<HR>
+
+<ADDRESS>
+Ronald Tschal&auml;r / 6. May 2001 /
+<A HREF="mailto:ronald@innovation.ch">ronald@innovation.ch</A>.
+</ADDRESS>
+
+</BODY>
+
+</HTML>
+
