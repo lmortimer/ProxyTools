@@ -33,10 +33,22 @@ h1 {
 	margin: 1em 0;
 }
 
-.add_proxies {
+.app_nav {
 
 	text-align: center;
+    margin:12px;
 }
+
+.button {
+
+    background-color: #BCD9E1;
+    padding:8px;
+    text-decoration:none;
+    font-size:18px;
+    color:black;
+}
+
+
 
 /*
  * DataTables framework
