@@ -93,6 +93,11 @@
 			};
 
 
+            $("#filter_alive").on('click', function(){
+                dt.fnFilter('true');
+            });
+
+
 			$("#button_checkproxies").click(function(){
 
 				var ips = $("#textarea_proxies").val().split("\n");
