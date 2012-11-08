@@ -55,7 +55,11 @@
 
 		$(document).ready(function(){
 
-			$('#datatable').dataTable();
+			var dt = $('#datatable').dataTable({
+                "aoColumnDefs": [
+                                    {"bSearchable":true, "bVisible":false, "aTargets":[1]},
+                                ]
+            });
 
 			var socket = new WebSocket("ws://127.0.0.1:8080");
 
@@ -75,7 +79,8 @@
 					$("<tr class='" + status + "'><td>" + packet.ip + " | " + packet.location + "</td></tr>").hide().prependTo("#results").fadeIn(1000);
 					$('#datatable').dataTable().fnAddData([
 				        packet.ip,
-				        packet.alive,
+                        packet.alive, //second column is hidden
+                        "<img src='/images/" + packet.alive + ".png' alt='" + packet.alive + "'/>",
 				        packet.ptype,
 				        "<img src='/images/flags/" + packet.location + ".gif' alt='" + packet.location + "'>",
 				        packet.anonymity]);
@@ -129,7 +134,8 @@
 				<thead>
 					<tr>
 						<th>IP</th>
-						<th>Alive</td>
+                        <th>Alive</th>
+						<th>Alive</th>
 						<th>Type</th>
 						<th>Country</th>
 						<th>Anonymity Level</th>
