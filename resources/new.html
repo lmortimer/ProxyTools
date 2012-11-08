@@ -64,7 +64,6 @@
 			var socket = new WebSocket("ws://127.0.0.1:8080");
 
 			socket.onmessage = function(event){
-				console.log(event);
 
 				var packet = JSON.parse(event.data);
 
