@@ -58,7 +58,11 @@
 			var dt = $('#datatable').dataTable({
                 "aoColumnDefs": [
                                     {"bSearchable":true, "bVisible":false, "aTargets":[1]},
-                                ]
+                                ],
+                
+                "bPaginate":false,
+                "bScrollCollapse":true,
+                "sScrollY": "600px",
             });
 
 			var socket = new WebSocket("ws://127.0.0.1:8080");
