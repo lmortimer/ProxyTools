@@ -3,7 +3,7 @@ Super fast SOCKS and HTTP proxy tester. Clojure backend. HTML5 + WebSocket front
 
 In the future it will be expanded into a full software suite for finding, testing and manipulating SOCKS and HTTP proxies.
 
-![Preview](http://i.imgur.com/7gTVC.png)
+![Preview](https://raw.github.com/lastkarrde/ProxyTools/master/resources/public/images/preview.png)
 
 
 ## Installation
